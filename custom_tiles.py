@@ -60,4 +60,15 @@ other = Image.open('tilesets/WA_Other_Furniture.png').convert('RGBA')
 sink = other.crop((3 * T, 5 * T, 4 * T, 6 * T))
 img.alpha_composite(sink.rotate(90), at(19)); img.alpha_composite(sink.rotate(-90), at(20))
 
+# 3-seat bench/sofa (WA_Seats 1440-1442) turned vertical: 1x3 at tiles 14 / 22 / 30
+bench = seats.crop((0, 5 * T, 3 * T, 6 * T)).rotate(-90, expand=True)
+img.alpha_composite(bench, at(14))
+
+# planter strip that sits in the top half of a tile, so it touches a desk edge that starts mid-tile (tile 15)
+x0, y0 = at(15)
+d.rectangle([x0, y0 + 9, x0 + T - 1, y0 + 16], fill=(235, 235, 230), outline=(170, 170, 165))
+for px in range(x0 + 2, x0 + T - 2, 5):
+    d.polygon([(px, y0 + 10), (px + 2, y0 + 1), (px + 4, y0 + 10)], fill=(70, 150, 60))
+    d.polygon([(px + 1, y0 + 10), (px + 3, y0 + 4), (px + 5, y0 + 10)], fill=(40, 115, 45))
+
 img.save('tilesets/elunic_custom.png')

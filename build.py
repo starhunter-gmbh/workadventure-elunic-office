@@ -74,7 +74,7 @@ hwall(29, 52, 18); vwall(33, 12, 18); vwall(41, 13, 18); vwall(45, 13, 18)
 # right offices
 hwall(39, 52, 21); vwall(39, 21, 31); vwall(47, 21, 31)
 # right end of the open space: phone booth (1 person) and a small walled lounge-meeting corner
-WALL.add((38, 22)); hwall(35, 38, 24); vwall(35, 24, 30); vwall(38, 24, 30)
+hwall(37, 38, 22); hwall(35, 38, 24); vwall(35, 24, 30); vwall(38, 24, 30)
 # pillars in the open space
 for px in (8, 15, 22): WALL.add((px, 22))
 
@@ -96,7 +96,7 @@ door((8, 13))                 # office B <-> balcony
 door((4, 18), (9, 18), (13, 18))
 door((20, 16))               # meeting <-> lounge
 door((30, 18), (36, 18), (40, 18), (43, 18), (50, 18))
-door((49, 13))               # red room <-> right balcony
+door((50, 13))               # red room <-> right balcony
 door((45, 21), (49, 21))
 door((35, 29))                         # small lounge entrance
 door((27, 31), (28, 31))
@@ -145,6 +145,14 @@ def stamp(sx, sy, w, h, tx, ty, coll=True):
                 if g: put(n, tx + dx, ty + dy, g); any_t = True
             if coll and any_t and SRC['collisions'][i]: put('collisions', tx + dx, ty + dy, COLL)
 
+def stamp_onto(sx, sy, w, tx, ty, layer='furniture3'):
+    """Copy one source row into a single higher layer, so it overlays what is already there."""
+    for dx in range(w):
+        i = sy * SW + sx + dx
+        for n in FURN:
+            if SRC[n][i]: put(layer, tx + dx, ty, SRC[n][i])
+            if SRC['collisions'][i]: put('collisions', tx + dx, ty, COLL)
+
 def obj(layer, x, y, g, coll=True):
     put(layer, x, y, g)
     if coll: put('collisions', x, y, COLL)
@@ -176,7 +184,7 @@ for x in range(16, 23):
     c = 0 if x == 16 else 3 if x == 22 else 1
     obj('furniture1', x, 3, 1567 + c)
 stamp(10, 4, 1, 1, 15, 3, coll=False)                                   # chair at the left table end
-for dy in range(3): obj('furniture1', 23, 1 + dy, (TV + dy * 8) | FLIP_X) # TV on the right wall
+for dy in range(3): obj('furniture1', 23, 2 + dy, (TV + dy * 8) | FLIP_X) # TV on the right wall
 # lounge: plant, sofa + armchairs, curved reception desk, bar on the right
 plant_big(15, 7)
 stamp(2, 3, 4, 1, 16, 7)                       # sofa
@@ -195,10 +203,13 @@ block(22, 15, 2, 2, PINGPONG)
 stamp(*OUT_TABLE, 7, 10)
 plant_big(3, 11)
 # right balcony: lounge set on the left, table for 8 on the right
-stamp(2, 3, 4, 1, 39, 9)                       # sofa
-stamp(1, 4, 1, 2, 38, 10)                      # armchair left
-stamp(6, 5, 1, 1, 43, 11)                      # armchair right
-stamp(3, 5, 2, 1, 40, 11)                      # coffee table
+for dx in range(4):                            # long sofa at the bottom, facing up
+    for n in FURN:
+        g = SRC[n][3 * SW + 2 + dx]
+        if g: put(n, 39 + dx, 12, g | FLIP_Y)
+stamp(1, 4, 1, 2, 38, 9)                       # armchair left
+stamp(6, 5, 1, 1, 43, 10)                      # armchair right
+stamp(3, 5, 2, 1, 40, 10)                      # coffee table
 for i, g in enumerate([1567, 1568, 1569, 1570, 1577, 1578, 1579, 1580]):
     obj('furniture1', 46 + i % 4, 10 + i // 4, g)
 for x in range(46, 50):
@@ -219,26 +230,34 @@ stamp(12, 4, 2, 2, 38, 16)
 # kitchen: counter, coffee machine, fridge/printer cabinet
 stamp(2, 8, 1, 4, 44, 14); obj('furniture1', 42, 14, 136); obj('furniture1', 42, 15, 146); obj('furniture1', 42, 17, 165)
 # red meeting room
-plant_big(46, 14); stamp(10, 3, 4, 4, 47, 14)
+# dining room: long table, benches top / left / bottom, two spare chairs on the right wall, lane x50 free
+for x, (t, b) in zip(range(47, 50), ((1557, 1577), (1558, 1578), (1560, 1580))):
+    obj('furniture1', x, 15, t); obj('furniture1', x, 16, b)
+for i, g in enumerate((1440, 1441, 1442)):
+    put('furniture1', 47 + i, 14, g); put('furniture1', 47 + i, 17, g | FLIP_Y)
+put('furniture1', 46, 15, CUSTOM + 14); put('furniture1', 46, 16, CUSTOM + 22)
+stamp(13, 4, 1, 1, 51, 15, coll=False); stamp(13, 4, 1, 1, 51, 16, coll=False)
 # open space: planters + desk clusters as in Gather
-planter(10, 13, 20); planter(17, 19, 20); planter(24, 26, 24)
-stamp(*DESK4, 11, 21); stamp(*DESK4, 11, 26)
-stamp(*DESK4, 17, 21); stamp(*DESK4, 17, 26)
+stamp(*DESK4, 11, 21); stamp(10, 4, 4, 4, 11, 26); stamp_onto(10, 3, 4, 11, 25)   # two blocks flush
+stamp(*DESK4, 17, 21); stamp(10, 4, 4, 4, 17, 26); stamp_onto(10, 3, 4, 17, 25)   # two blocks flush
 stamp(*DESK4, 23, 25)
 stamp(*DESK4, 27, 25); stamp(*DESK4, 31, 25)
+for x in (12, 13, 18, 19, 24, 25): put('above2', x, 21 if x < 20 else 25, CUSTOM + 15)   # planters flush on the desk edge, desk-wide
 # white sideboard
 for x in range(28, 34): obj('furniture1', x, 22, 1598); obj('furniture1', x, 23, 1608)
 
 # left end of the open space: dart, kicker, TV with horseshoe couch, table tennis
 block(4, 21, 3, 2, KICKER)
-block(2, 25, 1, 3, TV)
+block(2, 26, 1, 3, TV)
 for i, g in enumerate([1375, 1376, 1377, 1388, 1389, 1390]):          # top arm, facing down
-    put('furniture1', 4 + i % 3, 23 + i // 3, g)
+    put('furniture1', 5 + i % 3, 24 + i // 3, g)
 for i, g in enumerate([1388, 1389, 1390, 1375, 1376, 1377]):          # bottom arm, flipped to face up
-    put('furniture1', 4 + i % 3, 27 + i // 3, g | FLIP_Y)
-block(7, 23, 2, 3, SOFA_SIDE, coll=False)                             # back of the U, closing both corners
-block(7, 26, 2, 3, SOFA_SIDE, coll=False)
-for y in (23, 25, 27): obj('furniture1', 10, y, 1687)                 # high tables
+    put('furniture1', 5 + i % 3, 28 + i // 3, g | FLIP_Y)
+block(7, 24, 2, 3, SOFA_SIDE, coll=False)                             # back of the U, closing both corners
+block(7, 27, 2, 3, SOFA_SIDE, coll=False)
+for y, g in zip(range(24, 30), (1627, 1637, 1647, 1647, 1657, 1667)):   # long high table along the couch, with laptops
+    obj('furniture1', 9, y, g)
+for y in (25, 28): put('furniture2', 9, y, 132)
 plant_big(2, 29)
 
 # right end of the open space: printer, phone booth, small lounge with two 2-seaters
@@ -250,12 +269,12 @@ stamp(3, 5, 2, 1, 36, 27, coll=False)                                  # coffee 
 for i, g in enumerate([1418, 1419, 1405, 1406]):
     put('furniture1', 36 + i % 2, 28 + i // 2, g | FLIP_Y)
 # right offices
-stamp(*DESK4, 41, 25)
+stamp(12, 9, 2, 5, 41, 25); stamp(16, 9, 2, 5, 43, 25)
 # rightmost office: desk bottom-left at the wall, small meeting table right-centre, cabinet above it
 stamp(12, 3, 2, 3, 48, 28)
 for (x, y), g in zip([(50, 25), (51, 25), (50, 26), (51, 26)], (1567, 1570, 1577, 1580)): obj('furniture1', x, y, g)
 stamp(10, 4, 1, 1, 49, 25, coll=False)                                 # chair left of the table
-put('furniture2', 50, 27, 1499); put('furniture2', 50, 28, 1512)       # chair below the table
+put('furniture2', 50, 26, 1499); put('furniture2', 50, 27, 1512)       # chair below the table
 for i, g in enumerate([233, 234, 245, 246]): obj('furniture1', 50 + i % 2, 22 + i // 2, g)
 for x0 in (40, 42):                                                  # cabinets against the wall
     for i, g in enumerate([233, 234, 245, 246]): obj('furniture1', x0 + i % 2, 22 + i // 2, g)
