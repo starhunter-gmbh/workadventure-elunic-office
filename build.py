@@ -261,7 +261,8 @@ plant_big(2, 29)
 
 # right end of the open space: printer, phone booth, small lounge with two 2-seaters
 obj('furniture1', 38, 23, 136); obj('furniture1', 38, 24, 146)   # printer
-put('furniture1', 38, 26, 1471); put('furniture2', 38, 26, 110)       # booth: seat + screen
+obj('furniture1', 38, 26, 1471); put('furniture2', 38, 26, 110)   # booth desk blocks; you stand at (37,26)
+put('furniture2', 37, 26, 1494)                                        # booth chair facing the screen       # booth: seat + screen
 # small lounge: sofa / square table (right) + free entry square / sofa, one row each
 put('furniture1', 36, 28, CUSTOM + 34); put('furniture1', 37, 28, CUSTOM + 35)   # top sofa, facing down
 obj('furniture1', 37, 29, 1702)                                                    # square table
