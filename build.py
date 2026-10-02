@@ -74,7 +74,7 @@ hwall(29, 52, 18); vwall(33, 12, 18); vwall(41, 13, 18); vwall(45, 13, 18)
 # right offices
 hwall(39, 52, 21); vwall(39, 21, 31); vwall(47, 21, 31)
 # right end of the open space: phone booth (1 person) and a small walled lounge-meeting corner
-hwall(37, 38, 22); hwall(35, 38, 24); vwall(35, 24, 30); vwall(38, 24, 30)
+hwall(37, 38, 23); hwall(35, 38, 25); vwall(35, 25, 30); vwall(38, 25, 30)   # booth (38,24) between two walls; lounge box below
 # pillars in the open space
 for px in (8, 15, 22): WALL.add((px, 22))
 
@@ -98,7 +98,7 @@ door((20, 16))               # meeting <-> lounge
 door((30, 18), (36, 18), (40, 18), (43, 18), (50, 18))
 door((50, 13))               # red room <-> right balcony
 door((45, 21), (49, 21))
-door((35, 29))                         # small lounge entrance
+door((35, 28))                         # small lounge entrance
 door((27, 31), (28, 31))
 for x in range(21, 29): WALL.discard((x, 18))   # lounge open towards corridor
 
@@ -261,13 +261,13 @@ for y in (25, 28): put('furniture2', 9, y, 132)
 plant_big(2, 29)
 
 # right end of the open space: printer, phone booth, small lounge with two 2-seaters
-obj('furniture1', 38, 21, 146)   # printer, one tile so the corridor stays free
-put('furniture1', 38, 23, 1471); put('furniture2', 38, 23, 110)       # booth: seat + screen
-for i, g in enumerate([1405, 1406, 1418, 1419]):
-    put('furniture1', 36 + i % 2, 25 + i // 2, g)
-stamp(3, 5, 2, 1, 36, 27, coll=False)                                  # coffee table
-for i, g in enumerate([1418, 1419, 1405, 1406]):
-    put('furniture1', 36 + i % 2, 28 + i // 2, g | FLIP_Y)
+obj('furniture1', 38, 21, 136); obj('furniture1', 38, 22, 146)   # printer
+put('furniture1', 38, 24, 1471); put('furniture2', 38, 24, 110)       # booth: seat + screen
+for i, g in enumerate([1418, 1419, 1405, 1406]):                      # top sofa, facing down
+    put('furniture1', 36 + i % 2, 26 + i // 2, g | FLIP_Y)
+stamp(3, 5, 2, 1, 36, 28, coll=False)                                  # coffee table
+for i, g in enumerate([1405, 1406, 1418, 1419]):                      # bottom sofa at the wall, facing up
+    put('furniture1', 36 + i % 2, 29 + i // 2, g)
 # right offices
 stamp(12, 9, 2, 5, 41, 25); stamp(16, 9, 2, 5, 43, 25)
 # rightmost office: desk bottom-left at the wall, small meeting table right-centre, cabinet above it
