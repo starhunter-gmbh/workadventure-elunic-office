@@ -244,7 +244,7 @@ block(8, 26, 2, 2, PINGPONG)
 plant_big(2, 29)
 
 # right end of the open space: printer, phone booth, small lounge with two 2-seaters
-obj('furniture1', 38, 20, 136); obj('furniture1', 38, 21, 146)
+obj('furniture1', 38, 21, 146)   # printer, one tile so the corridor stays free
 put('furniture1', 38, 23, 1471); put('furniture2', 38, 23, 110)       # booth: seat + screen
 for i, g in enumerate([1405, 1406, 1418, 1419]):
     put('furniture1', 36 + i % 2, 25 + i // 2, g)
