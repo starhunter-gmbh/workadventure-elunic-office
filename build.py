@@ -97,7 +97,7 @@ door((4, 18), (9, 18), (13, 18))
 door((20, 16))               # meeting <-> lounge
 door((30, 18), (36, 18), (40, 18), (43, 18), (50, 18))
 door((49, 13))               # red room <-> right balcony
-door((45, 21), (50, 21))
+door((45, 21), (49, 21))
 door((35, 29))                         # small lounge entrance
 door((27, 31), (28, 31))
 for x in range(21, 29): WALL.discard((x, 18))   # lounge open towards corridor
@@ -251,7 +251,12 @@ for i, g in enumerate([1418, 1419, 1405, 1406]):
     put('furniture1', 36 + i % 2, 28 + i // 2, g | FLIP_Y)
 # right offices
 stamp(*DESK4, 41, 25)
-stamp(10, 3, 2, 3, 49, 24); stamp(10, 3, 2, 3, 48, 27)
+# rightmost office: desk bottom-left at the wall, small meeting table right-centre, cabinet above it
+stamp(12, 3, 2, 3, 48, 28)
+for (x, y), g in zip([(50, 25), (51, 25), (50, 26), (51, 26)], (1567, 1570, 1577, 1580)): obj('furniture1', x, y, g)
+stamp(10, 4, 1, 1, 49, 25, coll=False)                                 # chair left of the table
+put('furniture2', 50, 27, 1499); put('furniture2', 50, 28, 1512)       # chair below the table
+for i, g in enumerate([233, 234, 245, 246]): obj('furniture1', 50 + i % 2, 22 + i // 2, g)
 for x0 in (40, 42):                                                  # cabinets against the wall
     for i, g in enumerate([233, 234, 245, 246]): obj('furniture1', x0 + i % 2, 22 + i // 2, g)
 # entrance
