@@ -42,7 +42,7 @@ floor(37, 8, 52, 13, STONE)          # right balcony
 floor(29, 12, 37, 18, TILE_WHITE); floor(37, 13, 41, 18, TILE_WHITE)  # WCs + server room
 floor(41, 13, 45, 18, TILE_WHITE)    # kitchen
 floor(45, 13, 52, 18, RED)           # red meeting room
-floor(13, 14, 19, 17, SLATE)         # meeting room
+floor(13, 14, 19, 18, SLATE)         # meeting room (incl. its door)
 floor(39, 21, 52, 31, STONE)         # right offices (light grey)
 floor(25, 31, 31, 33, STONE)         # bottom balcony
 floor(25, 0, 29, 5, SLATE)           # stairwell (main entrance, north of reception)
@@ -74,7 +74,7 @@ hwall(29, 52, 18); vwall(33, 12, 18); vwall(41, 13, 18); vwall(45, 13, 18)
 # right offices
 hwall(39, 52, 21); vwall(39, 21, 31); vwall(47, 21, 31)
 # right end of the open space: phone booth (1 person) and a small walled lounge-meeting corner
-hwall(37, 38, 22); hwall(35, 38, 24); vwall(35, 24, 30)
+WALL.add((38, 22)); hwall(35, 38, 24); vwall(35, 24, 30); vwall(38, 24, 30)
 # pillars in the open space
 for px in (8, 15, 22): WALL.add((px, 22))
 
@@ -90,17 +90,16 @@ for y in range(32, 35): FENCE.add((24, y)); FENCE.add((32, y))
 # doors
 hwall(24, 29, 0); vwall(29, 0, 6)       # stairwell walls
 door((26, 6), (27, 6))                 # stairwell -> reception
-door((21, 6), (22, 6))                 # conference <-> lounge
-door((14, 11), (14, 12))               # lounge <-> left balcony
-door((8, 13), (9, 13))                 # office B <-> balcony
-door((4, 18), (5, 18), (9, 18), (13, 18), (14, 18))
-door((20, 15), (20, 16))               # meeting <-> lounge
-door((30, 18), (36, 18), (39, 18), (40, 18), (43, 18), (50, 18))
-door((49, 13), (50, 13))               # red room <-> right balcony
-door((45, 21), (46, 21), (50, 21))
-vwall(36, 22, 24)
-door((36, 23), (35, 30))               # phone booth, small lounge
-door((26, 31), (27, 31), (28, 31), (29, 31), (30, 31))
+door((22, 6))                 # conference <-> lounge
+door((14, 11))               # lounge <-> left balcony
+door((8, 13))                 # office B <-> balcony
+door((4, 18), (9, 18), (13, 18))
+door((20, 16))               # meeting <-> lounge
+door((30, 18), (36, 18), (40, 18), (43, 18), (50, 18))
+door((49, 13))               # red room <-> right balcony
+door((45, 21), (50, 21))
+door((35, 29))                         # small lounge entrance
+door((27, 31), (28, 31))
 for x in range(21, 29): WALL.discard((x, 18))   # lounge open towards corridor
 
 def wall_tile(x, y):
@@ -157,12 +156,17 @@ COUNTER = (1, 7, 2, 6)
 OUT_TABLE = (12, 18, 6, 2)
 BENCHES = (21, 17, 5, 1)
 
+def block(x, y, w, h, first, cols=8, flip=0, coll=True):
+    """Place a w*h block from the custom tileset (index layout with `cols` columns)."""
+    for dy in range(h):
+        for dx in range(w):
+            obj('furniture1', x + dx, y + dy, (first + dy * cols + dx) | flip, coll)
 def plant_big(x, y):
     put('furniture2', x, y, 91); put('furniture1', x, y + 1, 103); put('collisions', x, y + 1, COLL)
 def plant_small(x, y):
     obj('furniture1', x, y, 83)
 def planter(x0, x1, y):
-    for x in range(x0, x1 + 1): obj('furniture1', x, y, 83)
+    for x in range(x0, x1 + 1): put('furniture1', x, y, 83)
 
 # conference room: long table centred
 for x in range(17, 22):
@@ -170,8 +174,7 @@ for x in range(17, 22):
     put('furniture2', x, 4, 1499); put('furniture2', x, 5, 1512)        # chairs facing up
 for x in range(16, 23):
     c = 0 if x == 16 else 3 if x == 22 else 1
-    put('above1', x, 2, 1557 + c); put('furniture1', x, 3, 1567 + c); put('furniture1', x, 4, 1577 + c)
-    for y in (2, 3, 4): put('collisions', x, y, COLL)
+    obj('furniture1', x, 3, 1567 + c)
 stamp(10, 4, 1, 1, 15, 3, coll=False)                                   # chair at the left table end
 for dy in range(3): obj('furniture1', 23, 1 + dy, (TV + dy * 8) | FLIP_X) # TV on the right wall
 # lounge: plant, sofa + armchairs, curved reception desk, bar on the right
@@ -183,10 +186,11 @@ for x in range(16, 23):                        # reception counter, horizontal p
 obj('furniture1', 16, 10, 1597); obj('furniture1', 16, 11, 1607)
 for y, g in zip(range(10, 14), (1627, 1637, 1647, 1667)):   # reception counter, right wing of the L
     obj('furniture1', 23, y, g)
-put('furniture2', 18, 10, 110)                 # monitor
+put('furniture2', 18, 10, 110); put('furniture2', 21, 10, 110)   # two workstations
 stamp(10, 4, 1, 1, 18, 12, coll=False); stamp(10, 4, 1, 1, 21, 12, coll=False)
-stamp(*COUNTER, 26, 12)                        # bar (walkable lane behind it)
-plant_small(28, 10)
+for y, g in zip(range(9, 15), (1627, 1637, 1647, 1647, 1657, 1667)):   # long table along the right wall
+    obj('furniture1', 28, y, g)
+block(22, 15, 2, 2, PINGPONG)
 # left balcony
 stamp(*OUT_TABLE, 7, 10)
 plant_big(3, 11)
@@ -217,30 +221,24 @@ stamp(2, 8, 1, 4, 44, 14); obj('furniture1', 42, 14, 136); obj('furniture1', 42,
 # red meeting room
 plant_big(46, 14); stamp(10, 3, 4, 4, 47, 14)
 # open space: planters + desk clusters as in Gather
-planter(10, 13, 22); planter(17, 19, 22); planter(25, 27, 24)
-stamp(*DESK4, 11, 23); stamp(10, 3, 4, 4, 11, 27)
-stamp(*DESK4, 17, 23); stamp(10, 3, 4, 4, 17, 27)
+planter(10, 13, 20); planter(17, 19, 20); planter(24, 26, 24)
+stamp(*DESK4, 11, 21); stamp(*DESK4, 11, 26)
+stamp(*DESK4, 17, 21); stamp(*DESK4, 17, 26)
 stamp(*DESK4, 23, 25)
 stamp(*DESK4, 27, 25); stamp(*DESK4, 31, 25)
 # white sideboard
-for x in range(28, 35): obj('furniture1', x, 22, 1598); obj('furniture1', x, 23, 1608)
-
-def block(x, y, w, h, first, cols=8, flip=0, coll=True):
-    """Place a w*h block from the custom tileset (index layout with `cols` columns)."""
-    for dy in range(h):
-        for dx in range(w):
-            obj('furniture1', x + dx, y + dy, (first + dy * cols + dx) | flip, coll)
+for x in range(28, 34): obj('furniture1', x, 22, 1598); obj('furniture1', x, 23, 1608)
 
 # left end of the open space: dart, kicker, TV with horseshoe couch, table tennis
-obj('furniture1', 2, 20, DART)
 block(4, 21, 3, 2, KICKER)
 block(2, 25, 1, 3, TV)
 for i, g in enumerate([1375, 1376, 1377, 1388, 1389, 1390]):          # top arm, facing down
-    put('furniture1', 3 + i % 3, 23 + i // 3, g)
+    put('furniture1', 4 + i % 3, 23 + i // 3, g)
 for i, g in enumerate([1388, 1389, 1390, 1375, 1376, 1377]):          # bottom arm, flipped to face up
-    put('furniture1', 3 + i % 3, 28 + i // 3, g | FLIP_Y)
-block(6, 25, 2, 3, SOFA_SIDE, coll=False)                                          # back of the horseshoe
-block(8, 26, 2, 2, PINGPONG)
+    put('furniture1', 4 + i % 3, 27 + i // 3, g | FLIP_Y)
+block(7, 23, 2, 3, SOFA_SIDE, coll=False)                             # back of the U, closing both corners
+block(7, 26, 2, 3, SOFA_SIDE, coll=False)
+for y in (23, 25, 27): obj('furniture1', 10, y, 1687)                 # high tables
 plant_big(2, 29)
 
 # right end of the open space: printer, phone booth, small lounge with two 2-seaters
@@ -248,13 +246,14 @@ obj('furniture1', 38, 21, 146)   # printer, one tile so the corridor stays free
 put('furniture1', 38, 23, 1471); put('furniture2', 38, 23, 110)       # booth: seat + screen
 for i, g in enumerate([1405, 1406, 1418, 1419]):
     put('furniture1', 36 + i % 2, 25 + i // 2, g)
-stamp(3, 5, 2, 1, 36, 27)                                              # coffee table
+stamp(3, 5, 2, 1, 36, 27, coll=False)                                  # coffee table
 for i, g in enumerate([1418, 1419, 1405, 1406]):
     put('furniture1', 36 + i % 2, 28 + i // 2, g | FLIP_Y)
 # right offices
 stamp(*DESK4, 41, 25)
 stamp(10, 3, 2, 3, 49, 24); stamp(10, 3, 2, 3, 48, 27)
-for x in range(40, 44): obj('furniture1', x, 22, 1598)
+for x0 in (40, 42):                                                  # cabinets against the wall
+    for i, g in enumerate([233, 234, 245, 246]): obj('furniture1', x0 + i % 2, 22 + i // 2, g)
 # entrance
 plant_big(25, 32); plant_big(31, 32)
 
