@@ -203,12 +203,12 @@ for x in range(46, 50):
 stamp(10, 3, 2, 3, 4, 14); stamp(10, 3, 2, 3, 9, 14)
 # meeting room
 stamp(12, 10, 6, 4, 13, 14)
-# WCs: sinks at the door, toilets behind the partition wall; men's (left) with 2 urinals on the left wall
+# WCs: sink at the door, toilets behind the partition wall; men's (right) with 2 urinals on the left wall
 for bx in (30, 34):
     obj('furniture1', bx, 13, 284); obj('furniture1', bx + 2, 13, 284)
-put('furniture1', 30, 14, URINAL); put('furniture1', 30, 15, URINAL)
-obj('furniture1', 31, 17, 282); obj('furniture1', 32, 17, 282)
-obj('furniture1', 34, 17, 282); obj('furniture1', 35, 17, 282)
+put('furniture1', 34, 14, URINAL); put('furniture1', 34, 15, URINAL)   # men's = right WC
+obj('furniture1', 32, 17, CUSTOM + 20)                                   # one sink per WC, against the side wall
+obj('furniture1', 34, 17, CUSTOM + 19)
 # server room: racks + admin desk
 for y in (14, 15): obj('furniture1', 38, y, 133); obj('furniture1', 39, y, 134)
 stamp(12, 4, 2, 2, 38, 16)

@@ -55,4 +55,9 @@ sofa = seats.crop((0, 0, 3 * T, 2 * T)).rotate(-90, expand=True)   # 64x96, back
 x0, y0 = at(16)
 img.alpha_composite(sofa, (x0, y0))
 
+# sink (WA_Other_Furniture 282) turned towards a side wall: tile 19 back on the left, tile 20 back on the right
+other = Image.open('tilesets/WA_Other_Furniture.png').convert('RGBA')
+sink = other.crop((3 * T, 5 * T, 4 * T, 6 * T))
+img.alpha_composite(sink.rotate(90), at(19)); img.alpha_composite(sink.rotate(-90), at(20))
+
 img.save('tilesets/elunic_custom.png')
