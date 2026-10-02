@@ -239,9 +239,9 @@ put('furniture2', 51, 15, 1495); put('furniture2', 51, 16, 1495)
 # open space: planters + desk clusters as in Gather
 stamp(*DESK4, 11, 21); stamp(10, 4, 4, 4, 11, 26); stamp_onto(10, 3, 4, 11, 25)   # two blocks flush
 stamp(*DESK4, 17, 21); stamp(10, 4, 4, 4, 17, 26); stamp_onto(10, 3, 4, 17, 25)   # two blocks flush
-stamp(*DESK4, 23, 25)
-stamp(*DESK4, 27, 25); stamp(*DESK4, 31, 25)
-for x in (12, 13, 18, 19, 24, 25): put('above2', x, 21 if x < 20 else 25, CUSTOM + 15)   # planters flush on the desk edge, desk-wide
+stamp(*DESK4, 22, 25)
+stamp(*DESK4, 26, 25); stamp(*DESK4, 30, 25)
+for x in (12, 13, 18, 19, 23, 24): put('above2', x, 21 if x < 20 else 25, CUSTOM + 15)   # planters flush on the desk edge, desk-wide
 # white sideboard
 for x in range(28, 34): obj('furniture1', x, 22, 1598); obj('furniture1', x, 23, 1608)
 
