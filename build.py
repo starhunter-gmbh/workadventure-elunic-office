@@ -178,12 +178,11 @@ def planter(x0, x1, y):
 
 # conference room: long table centred
 for x in range(17, 22):
-    put('furniture2', x, 1, 1497); put('furniture2', x, 2, 1510)        # chairs facing down
-    put('furniture2', x, 4, 1499); put('furniture2', x, 5, 1512)        # chairs facing up
+    put('furniture2', x, 2, 1492); put('furniture2', x, 4, 1493)        # one-tile chairs, facing the table
 for x in range(16, 23):
     c = 0 if x == 16 else 3 if x == 22 else 1
     obj('furniture1', x, 3, 1567 + c)
-stamp(10, 4, 1, 1, 15, 3, coll=False)                                   # chair at the left table end
+put('furniture2', 15, 3, 1494)                                          # chair at the left table end
 for dy in range(3): obj('furniture1', 23, 2 + dy, (TV + dy * 8) | FLIP_X) # TV on the right wall
 # lounge: plant, sofa + armchairs, curved reception desk, bar on the right
 plant_big(15, 7)
@@ -236,7 +235,7 @@ for x, (t, b) in zip(range(47, 50), ((1557, 1577), (1558, 1578), (1560, 1580))):
 for i, g in enumerate((1440, 1441, 1442)):
     put('furniture1', 47 + i, 14, g); put('furniture1', 47 + i, 17, g | FLIP_Y)
 put('furniture1', 46, 15, CUSTOM + 14); put('furniture1', 46, 16, CUSTOM + 22)
-stamp(13, 4, 1, 1, 51, 15, coll=False); stamp(13, 4, 1, 1, 51, 16, coll=False)
+put('furniture2', 51, 15, 1495); put('furniture2', 51, 16, 1495)
 # open space: planters + desk clusters as in Gather
 stamp(*DESK4, 11, 21); stamp(10, 4, 4, 4, 11, 26); stamp_onto(10, 3, 4, 11, 25)   # two blocks flush
 stamp(*DESK4, 17, 21); stamp(10, 4, 4, 4, 17, 26); stamp_onto(10, 3, 4, 17, 25)   # two blocks flush
@@ -273,8 +272,8 @@ stamp(12, 9, 2, 5, 41, 25); stamp(16, 9, 2, 5, 43, 25)
 # rightmost office: desk bottom-left at the wall, small meeting table right-centre, cabinet above it
 stamp(12, 3, 2, 3, 48, 28)
 for (x, y), g in zip([(50, 25), (51, 25), (50, 26), (51, 26)], (1567, 1570, 1577, 1580)): obj('furniture1', x, y, g)
-stamp(10, 4, 1, 1, 49, 25, coll=False)                                 # chair left of the table
-put('furniture2', 50, 26, 1499); put('furniture2', 50, 27, 1512)       # chair below the table
+put('furniture2', 49, 25, 1494)                                 # chair left of the table
+put('furniture2', 50, 27, 1493)       # chair below the table
 for i, g in enumerate([233, 234, 245, 246]): obj('furniture1', 50 + i % 2, 22 + i // 2, g)
 for x0 in (40, 42):                                                  # cabinets against the wall
     for i, g in enumerate([233, 234, 245, 246]): obj('furniture1', x0 + i % 2, 22 + i // 2, g)
