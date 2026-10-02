@@ -74,7 +74,7 @@ hwall(29, 52, 18); vwall(33, 12, 18); vwall(41, 13, 18); vwall(45, 13, 18)
 # right offices
 hwall(39, 52, 21); vwall(39, 21, 31); vwall(47, 21, 31)
 # right end of the open space: phone booth (1 person) and a small walled lounge-meeting corner
-hwall(37, 38, 23); hwall(35, 38, 25); vwall(35, 25, 30); vwall(38, 25, 30)   # booth (38,24) between two walls; lounge box below
+hwall(37, 38, 25); hwall(35, 38, 27); vwall(35, 27, 30); vwall(38, 27, 30)   # booth (38,26) between two walls; lounge box below
 # pillars in the open space
 for px in (8, 15, 22): WALL.add((px, 22))
 
@@ -98,7 +98,7 @@ door((20, 16))               # meeting <-> lounge
 door((30, 18), (36, 18), (40, 18), (43, 18), (50, 18))
 door((50, 13))               # red room <-> right balcony
 door((45, 21), (49, 21))
-door((35, 28))                         # small lounge entrance
+door((35, 29))                         # small lounge entrance
 door((27, 31), (28, 31))
 for x in range(21, 29): WALL.discard((x, 18))   # lounge open towards corridor
 
@@ -260,13 +260,12 @@ for y in (25, 28): put('furniture2', 9, y, 132)
 plant_big(2, 29)
 
 # right end of the open space: printer, phone booth, small lounge with two 2-seaters
-obj('furniture1', 38, 21, 136); obj('furniture1', 38, 22, 146)   # printer
-put('furniture1', 38, 24, 1471); put('furniture2', 38, 24, 110)       # booth: seat + screen
-for i, g in enumerate([1418, 1419, 1405, 1406]):                      # top sofa, facing down
-    put('furniture1', 36 + i % 2, 26 + i // 2, g | FLIP_Y)
-for y in (27, 28, 29): obj('furniture2', 37, y, 1568)                  # table, one tile wide (right-aligned), reaching both sofas
-for i, g in enumerate([1405, 1406, 1418, 1419]):                      # bottom sofa at the wall, facing up
-    put('furniture1', 36 + i % 2, 29 + i // 2, g)
+obj('furniture1', 38, 23, 136); obj('furniture1', 38, 24, 146)   # printer
+put('furniture1', 38, 26, 1471); put('furniture2', 38, 26, 110)       # booth: seat + screen
+# small lounge: sofa / square table (right) + free entry square / sofa, one row each
+put('furniture1', 36, 28, CUSTOM + 34); put('furniture1', 37, 28, CUSTOM + 35)   # top sofa, facing down
+obj('furniture1', 37, 29, 1702)                                                    # square table
+put('furniture1', 36, 30, CUSTOM + 26); put('furniture1', 37, 30, CUSTOM + 27)   # bottom sofa at the wall, facing up
 # right offices
 stamp(12, 9, 2, 5, 41, 25); stamp(16, 9, 2, 5, 43, 25)
 # rightmost office: desk bottom-left at the wall, small meeting table right-centre, cabinet above it

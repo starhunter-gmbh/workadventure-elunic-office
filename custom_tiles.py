@@ -71,4 +71,9 @@ for px in range(x0 + 2, x0 + T - 2, 5):
     d.polygon([(px, y0 + 10), (px + 2, y0 + 1), (px + 4, y0 + 10)], fill=(70, 150, 60))
     d.polygon([(px + 1, y0 + 10), (px + 3, y0 + 4), (px + 5, y0 + 10)], fill=(40, 115, 45))
 
+# 2-seat sofa (WA_Seats 1405/1406/1418/1419) squeezed into one tile row: tiles 26-27 facing up, 34-35 facing down
+two = seats.crop((4 * T, 2 * T, 6 * T, 4 * T))
+two = two.crop(two.getbbox()).resize((2 * T, T), Image.NEAREST)
+img.alpha_composite(two, at(26)); img.alpha_composite(two.transpose(Image.FLIP_TOP_BOTTOM), at(34))
+
 img.save('tilesets/elunic_custom.png')
