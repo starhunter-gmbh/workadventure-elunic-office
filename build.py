@@ -264,7 +264,7 @@ obj('furniture1', 38, 21, 136); obj('furniture1', 38, 22, 146)   # printer
 put('furniture1', 38, 24, 1471); put('furniture2', 38, 24, 110)       # booth: seat + screen
 for i, g in enumerate([1418, 1419, 1405, 1406]):                      # top sofa, facing down
     put('furniture1', 36 + i % 2, 26 + i // 2, g | FLIP_Y)
-stamp(3, 5, 2, 1, 36, 28, coll=False)                                  # coffee table
+for y in (27, 28, 29): obj('furniture2', 37, y, 1568)                  # table, one tile wide (right-aligned), reaching both sofas
 for i, g in enumerate([1405, 1406, 1418, 1419]):                      # bottom sofa at the wall, facing up
     put('furniture1', 36 + i % 2, 29 + i // 2, g)
 # right offices
