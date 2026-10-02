@@ -22,6 +22,10 @@ def get(layer, x, y): return L[layer][y * W + x]
 # --- tile ids ---
 GRASS, WOOD_LIGHT, WOOD_DARK, TILE_WHITE, SLATE, STONE, RED = 2461, 725, 752, 733, 735, 758, 762
 COLL = 3
+CUSTOM = 3000          # firstgid of tilesets/elunic_custom.png (see custom_tiles.py)
+FLIP_Y = 0x40000000
+FLIP_X = 0x80000000
+KICKER, PINGPONG, TV, DART, SOFA_SIDE, URINAL = CUSTOM + 0, CUSTOM + 3, CUSTOM + 5, CUSTOM + 6, CUSTOM + 16, CUSTOM + 7
 FACE = 603
 
 def floor(x0, y0, x1, y1, g):
@@ -62,12 +66,15 @@ hwall(14, 24, 6)
 hwall(12, 20, 13)
 # WC walls: towards lounge, towards server room, stall dividers
 vwall(29, 12, 18); vwall(37, 12, 18)
-vwall(31, 13, 14); vwall(35, 13, 14)
+vwall(31, 13, 13); vwall(35, 13, 13)          # stall dividers
+hwall(31, 32, 16); hwall(34, 35, 16)           # wall between sink area and toilets, passage at 30 / 36
 # front room row (bottom wall y18)
 hwall(1, 20, 18); vwall(7, 13, 18); vwall(12, 13, 18); vwall(20, 13, 18)
 hwall(29, 52, 18); vwall(33, 12, 18); vwall(41, 13, 18); vwall(45, 13, 18)
 # right offices
 hwall(39, 52, 21); vwall(39, 21, 31); vwall(47, 21, 31)
+# right end of the open space: phone booth (1 person) and a small walled lounge-meeting corner
+hwall(37, 38, 22); hwall(35, 38, 24); vwall(35, 24, 30)
 # pillars in the open space
 for px in (8, 15, 22): WALL.add((px, 22))
 
@@ -78,7 +85,7 @@ for x in range(36, 54): FENCE.add((x, 8))
 for y in range(8, 14): FENCE.add((53, y))
 for y in range(8, 12): FENCE.add((36, y))   # right balcony, left edge
 for x in range(24, 33): FENCE.add((x, 34))
-for y in range(31, 35): FENCE.add((24, y)); FENCE.add((32, y))
+for y in range(32, 35): FENCE.add((24, y)); FENCE.add((32, y))
 
 # doors
 hwall(24, 29, 0); vwall(29, 0, 6)       # stairwell walls
@@ -91,6 +98,8 @@ door((20, 15), (20, 16))               # meeting <-> lounge
 door((30, 18), (36, 18), (39, 18), (40, 18), (43, 18), (50, 18))
 door((49, 13), (50, 13))               # red room <-> right balcony
 door((45, 21), (46, 21), (50, 21))
+vwall(36, 22, 24)
+door((36, 23), (35, 30))               # phone booth, small lounge
 door((26, 31), (27, 31), (28, 31), (29, 31), (30, 31))
 for x in range(21, 29): WALL.discard((x, 18))   # lounge open towards corridor
 
@@ -156,7 +165,15 @@ def planter(x0, x1, y):
     for x in range(x0, x1 + 1): obj('furniture1', x, y, 83)
 
 # conference room: long table centred
-stamp(*LONGDESK, 16, 1); plant_big(15, 1)
+for x in range(17, 22):
+    put('furniture2', x, 1, 1497); put('furniture2', x, 2, 1510)        # chairs facing down
+    put('furniture2', x, 4, 1499); put('furniture2', x, 5, 1512)        # chairs facing up
+for x in range(16, 23):
+    c = 0 if x == 16 else 3 if x == 22 else 1
+    put('above1', x, 2, 1557 + c); put('furniture1', x, 3, 1567 + c); put('furniture1', x, 4, 1577 + c)
+    for y in (2, 3, 4): put('collisions', x, y, COLL)
+stamp(10, 4, 1, 1, 15, 3, coll=False)                                   # chair at the left table end
+for dy in range(3): obj('furniture1', 23, 1 + dy, (TV + dy * 8) | FLIP_X) # TV on the right wall
 # lounge: plant, sofa + armchairs, curved reception desk, bar on the right
 plant_big(15, 7)
 stamp(2, 3, 4, 1, 16, 7)                       # sofa
@@ -164,8 +181,8 @@ stamp(1, 4, 1, 2, 16, 8); stamp(6, 5, 1, 1, 19, 8)
 for x in range(16, 23):                        # reception counter, horizontal part
     obj('furniture1', x, 10, 1598); obj('furniture1', x, 11, 1608)
 obj('furniture1', 16, 10, 1597); obj('furniture1', 16, 11, 1607)
-for y in range(10, 13):                        # reception counter, curved right wing
-    obj('furniture1', 23, y, 1598 if y < 12 else 1608)
+for y, g in zip(range(10, 14), (1627, 1637, 1647, 1667)):   # reception counter, right wing of the L
+    obj('furniture1', 23, y, g)
 put('furniture2', 18, 10, 110)                 # monitor
 stamp(10, 4, 1, 1, 18, 12, coll=False); stamp(10, 4, 1, 1, 21, 12, coll=False)
 stamp(*COUNTER, 26, 12)                        # bar (walkable lane behind it)
@@ -186,9 +203,12 @@ for x in range(46, 50):
 stamp(10, 3, 2, 3, 4, 14); stamp(10, 3, 2, 3, 9, 14)
 # meeting room
 stamp(12, 10, 6, 4, 13, 14)
-# WCs
+# WCs: sinks at the door, toilets behind the partition wall; men's (left) with 2 urinals on the left wall
 for bx in (30, 34):
-    obj('furniture1', bx, 13, 284); obj('furniture1', bx + 2, 13, 284); obj('furniture1', 32 if bx == 30 else 34, 17, 283)  # sink away from the door
+    obj('furniture1', bx, 13, 284); obj('furniture1', bx + 2, 13, 284)
+put('furniture1', 30, 14, URINAL); put('furniture1', 30, 15, URINAL)
+obj('furniture1', 31, 17, 282); obj('furniture1', 32, 17, 282)
+obj('furniture1', 34, 17, 282); obj('furniture1', 35, 17, 282)
 # server room: racks + admin desk
 for y in (14, 15): obj('furniture1', 38, y, 133); obj('furniture1', 39, y, 134)
 stamp(12, 4, 2, 2, 38, 16)
@@ -200,17 +220,37 @@ plant_big(46, 14); stamp(10, 3, 4, 4, 47, 14)
 planter(10, 13, 22); planter(17, 19, 22); planter(25, 27, 24)
 stamp(*DESK4, 11, 23); stamp(10, 3, 4, 4, 11, 27)
 stamp(*DESK4, 17, 23); stamp(10, 3, 4, 4, 17, 27)
-stamp(*DESK4, 24, 25)
-stamp(*DESK4, 29, 25); stamp(*DESK4, 33, 25)
-# white sideboard + games corner
+stamp(*DESK4, 23, 25)
+stamp(*DESK4, 27, 25); stamp(*DESK4, 31, 25)
+# white sideboard
 for x in range(28, 35): obj('furniture1', x, 22, 1598); obj('furniture1', x, 23, 1608)
-stamp(*OUT_TABLE, 2, 20)                       # kicker placeholder
-obj('furniture1', 7, 26, 1561); obj('furniture1', 8, 26, 1562); obj('furniture1', 7, 27, 1571); obj('furniture1', 8, 27, 1572)  # table tennis placeholder
-for i, g in enumerate([241, 242, 253, 254, 265, 266]):
-    obj('furniture1', 2 + i % 2, 25 + i // 2, g)
-plant_big(2, 29); plant_small(2, 23)
-for i, g in enumerate([241, 242, 253, 254, 265, 266]):
-    obj('furniture1', 37 + i % 2, 25 + i // 2, g)
+
+def block(x, y, w, h, first, cols=8, flip=0, coll=True):
+    """Place a w*h block from the custom tileset (index layout with `cols` columns)."""
+    for dy in range(h):
+        for dx in range(w):
+            obj('furniture1', x + dx, y + dy, (first + dy * cols + dx) | flip, coll)
+
+# left end of the open space: dart, kicker, TV with horseshoe couch, table tennis
+obj('furniture1', 2, 20, DART)
+block(4, 21, 3, 2, KICKER)
+block(2, 25, 1, 3, TV)
+for i, g in enumerate([1375, 1376, 1377, 1388, 1389, 1390]):          # top arm, facing down
+    put('furniture1', 3 + i % 3, 23 + i // 3, g)
+for i, g in enumerate([1388, 1389, 1390, 1375, 1376, 1377]):          # bottom arm, flipped to face up
+    put('furniture1', 3 + i % 3, 28 + i // 3, g | FLIP_Y)
+block(6, 25, 2, 3, SOFA_SIDE, coll=False)                                          # back of the horseshoe
+block(8, 26, 2, 2, PINGPONG)
+plant_big(2, 29)
+
+# right end of the open space: printer, phone booth, small lounge with two 2-seaters
+obj('furniture1', 38, 20, 136); obj('furniture1', 38, 21, 146)
+put('furniture1', 38, 23, 1471); put('furniture2', 38, 23, 110)       # booth: seat + screen
+for i, g in enumerate([1405, 1406, 1418, 1419]):
+    put('furniture1', 36 + i % 2, 25 + i // 2, g)
+stamp(3, 5, 2, 1, 36, 27)                                              # coffee table
+for i, g in enumerate([1418, 1419, 1405, 1406]):
+    put('furniture1', 36 + i % 2, 28 + i // 2, g | FLIP_Y)
 # right offices
 stamp(*DESK4, 41, 25)
 stamp(10, 3, 2, 3, 49, 24); stamp(10, 3, 2, 3, 48, 27)
@@ -258,6 +298,8 @@ for l in layers:
         l['properties'] = [{"name": "startLayer", "type": "bool", "value": True}]
 
 out = copy.deepcopy(src)
+src['tilesets'].append({'firstgid': CUSTOM, 'name': 'elunic_custom', 'image': 'tilesets/elunic_custom.png', 'imageheight': 160, 'imagewidth': 256, 'columns': 8, 'tilecount': 40, 'tileheight': 32, 'tilewidth': 32, 'margin': 0, 'spacing': 0})
+out['tilesets'] = src['tilesets']
 out.update(width=W, height=H, layers=layers, nextlayerid=lid[0] + 1, nextobjectid=lid[0] + 1)
 out['properties'] = [
     {"name": "mapCopyright", "type": "string", "value": "Tilesets: WorkAdventure (https://workadventu.re), CC-BY-SA 3.0"},
@@ -275,6 +317,8 @@ for t in out['tilesets']:
 ts.sort()
 cache = {}
 def tile(g):
+    if g & FLIP_Y: return tile(g & ~FLIP_Y).transpose(Image.FLIP_TOP_BOTTOM)
+    if g & FLIP_X: return tile(g & ~FLIP_X).transpose(Image.FLIP_LEFT_RIGHT)
     g &= 0x1FFFFFFF
     if g in cache: return cache[g]
     for first, cols, im in reversed(ts):
