@@ -123,7 +123,7 @@ for y in range(H):
 for (x, y) in list(WALL):
     if wall_tile(x, y) in (479, 403, 404, 535, 440, 438) and (x, y + 1) not in WALL and y + 1 < H \
             and inside[y + 1][x] and y + 1 not in (19, 23) and get('floor1', x, y + 1) not in (STONE, GRASS):
-        put('walls2', x, y + 1, FACE)
+        pass  # faces disabled: they ate the top row of every room
 
 # --- stamps copied from the starter-kit office ---
 FURN = ['furniture1', 'furniture2', 'furniture3', 'above1', 'above2']
@@ -158,7 +158,7 @@ def planter(x0, x1, y):
 # conference room: long table centred
 stamp(*LONGDESK, 16, 1); plant_big(15, 1)
 # lounge: plant, sofa + armchairs, curved reception desk, bar on the right
-plant_big(15, 6)
+plant_big(15, 7)
 stamp(2, 3, 4, 1, 16, 7)                       # sofa
 stamp(1, 4, 1, 2, 16, 8); stamp(6, 5, 1, 1, 19, 8)
 for x in range(16, 23):                        # reception counter, horizontal part
@@ -168,7 +168,7 @@ for y in range(10, 13):                        # reception counter, curved right
     obj('furniture1', 23, y, 1598 if y < 12 else 1608)
 put('furniture2', 18, 10, 110)                 # monitor
 stamp(10, 4, 1, 1, 18, 12, coll=False); stamp(10, 4, 1, 1, 21, 12, coll=False)
-stamp(*COUNTER, 27, 12)                        # bar
+stamp(*COUNTER, 26, 12)                        # bar (walkable lane behind it)
 plant_small(28, 10)
 # left balcony
 stamp(*OUT_TABLE, 7, 10)
@@ -188,18 +188,18 @@ stamp(10, 3, 2, 3, 4, 14); stamp(10, 3, 2, 3, 9, 14)
 stamp(12, 10, 6, 4, 13, 14)
 # WCs
 for bx in (30, 34):
-    obj('furniture1', bx, 13, 284); obj('furniture1', bx + 1, 13, 284); obj('furniture1', bx + 2, 15, 283)
+    obj('furniture1', bx, 13, 284); obj('furniture1', bx + 2, 13, 284); obj('furniture1', 32 if bx == 30 else 34, 17, 283)  # sink away from the door
 # server room: racks + admin desk
-for y in (14, 15, 16): obj('furniture1', 38, y, 133); obj('furniture1', 39, y, 134)
-stamp(10, 3, 2, 3, 39, 15)
+for y in (14, 15): obj('furniture1', 38, y, 133); obj('furniture1', 39, y, 134)
+stamp(12, 4, 2, 2, 38, 16)
 # kitchen: counter, coffee machine, fridge/printer cabinet
-stamp(*COUNTER, 42, 13); obj('furniture1', 44, 14, 165); obj('furniture1', 44, 15, 136); obj('furniture1', 44, 16, 146)
+stamp(2, 8, 1, 4, 44, 14); obj('furniture1', 42, 14, 136); obj('furniture1', 42, 15, 146); obj('furniture1', 42, 17, 165)
 # red meeting room
-plant_big(46, 14); stamp(*DESK4, 47, 14)
+plant_big(46, 14); stamp(10, 3, 4, 4, 47, 14)
 # open space: planters + desk clusters as in Gather
 planter(10, 13, 22); planter(17, 19, 22); planter(25, 27, 24)
-stamp(*DESK4, 11, 23); stamp(*DESK4, 11, 27)
-stamp(*DESK4, 17, 23); stamp(*DESK4, 17, 27)
+stamp(*DESK4, 11, 23); stamp(10, 3, 4, 4, 11, 27)
+stamp(*DESK4, 17, 23); stamp(10, 3, 4, 4, 17, 27)
 stamp(*DESK4, 24, 25)
 stamp(*DESK4, 29, 25); stamp(*DESK4, 33, 25)
 # white sideboard + games corner
@@ -287,3 +287,27 @@ for n in ['floor1', 'floor2', 'walls1', 'walls2', 'furniture1', 'furniture2', 'f
             if g: img.alpha_composite(tile(g), (x * 32, y * 32))
 img.convert('RGB').save(f'{KIT}/elunic-office.png')
 print('ok', len(WALL))
+
+# --- sanity checks: furniture on walls, unreachable floor ---
+def check():
+    issues = []
+    for (x, y) in WALL:
+        for n in FURN:
+            if get(n, x, y): issues.append(f'furniture {n} on wall at {x},{y}')
+    for y in range(H):
+        for x in range(W):
+            if get('walls2', x, y) == FACE and any(get(n, x, y) for n in FURN):
+                issues.append(f'furniture on wall face at {x},{y}')
+    from collections import deque
+    start = [(x, y) for y in range(H) for x in range(W) if get('start', x, y)]
+    seen = set(start); q = deque(start)
+    while q:
+        x, y = q.popleft()
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < W and 0 <= ny < H and (nx, ny) not in seen and not get('collisions', nx, ny):
+                seen.add((nx, ny)); q.append((nx, ny))
+    unreach = [(x, y) for y in range(H) for x in range(W) if inside[y][x] and not get('collisions', x, y) and (x, y) not in seen]
+    return issues, unreach
+issues, unreach = check()
+print('\n'.join(issues)); print('unreachable', len(unreach), sorted(unreach, key=lambda c: (c[1], c[0])))
