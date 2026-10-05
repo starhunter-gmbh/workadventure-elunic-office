@@ -216,7 +216,11 @@ for x in range(46, 50):
 # office A / B
 stamp(10, 3, 2, 3, 4, 14); stamp(10, 3, 2, 3, 9, 14)
 # meeting room
-stamp(12, 10, 6, 4, 13, 14)
+for x in range(14, 19):                                                 # meeting room: table, one-tile chairs above and below
+    c = 0 if x == 14 else 3 if x == 18 else 1
+    obj('furniture1', x, 15, 1567 + c); obj('furniture1', x, 16, 1577 + c)
+for x in (14, 16, 18):
+    put('furniture2', x, 14, 1492); put('furniture2', x, 17, 1493); put('furniture2', x, 15, 110)
 # WCs: sink at the door, toilets behind the partition wall; men's (right) with 2 urinals on the left wall
 for bx in (30, 34):
     obj('furniture1', bx, 13, 284); obj('furniture1', bx + 2, 13, 284)
