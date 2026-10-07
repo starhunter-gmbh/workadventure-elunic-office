@@ -231,12 +231,14 @@ obj('furniture1', 34, 17, CUSTOM + 19)
 for y in (14, 15): obj('furniture1', 38, y, 133); obj('furniture1', 39, y, 134)
 stamp(12, 4, 2, 2, 38, 16)
 # kitchen: counter, coffee machine, fridge/printer cabinet
-stamp(1, 8, 1, 4, 44, 14)                                              # counter with coffee machine along the right wall
-put('above2', 44, 17, 167); put('above2', 44, 16, 203)                 # mugs, bread
-put('furniture1', 43, 15, 1525); put('furniture1', 43, 16, 1525)       # bar stools at the counter (walkable)
-obj('furniture1', 42, 14, 136); obj('furniture1', 42, 15, 146)          # fridge
-obj('furniture1', 42, 16, CUSTOM + 19)                                 # sink on the left wall
-obj('furniture1', 42, 17, 169)                                         # bin
+# kitchen, bottom to top -- left: counter, counter with stove, fridge (2); right: counter with sink / bread / coffee, bin
+obj('furniture1', 42, 17, CUSTOM + 28); obj('furniture1', 42, 16, CUSTOM + 23)
+obj('furniture1', 42, 15, 146); obj('furniture1', 42, 14, 136)
+obj('furniture1', 44, 17, CUSTOM + 31)
+obj('furniture1', 44, 16, CUSTOM + 28); put('furniture2', 44, 16, 203)
+obj('furniture1', 44, 15, CUSTOM + 28); put('furniture2', 44, 15, 165)
+obj('furniture1', 44, 14, 169)
+obj('furniture1', 43, 14, CUSTOM + 18)                                 # water dispenser, facing into the room
 # red meeting room
 # dining room: long table, benches top / left / bottom, two spare chairs on the right wall, lane x50 free
 for x, (t, b) in zip(range(47, 50), ((1557, 1577), (1558, 1578), (1560, 1580))):

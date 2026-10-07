@@ -76,4 +76,24 @@ two = seats.crop((4 * T, 2 * T, 6 * T, 4 * T))
 two = two.crop(two.getbbox()).resize((2 * T, T), Image.NEAREST)
 img.alpha_composite(two, at(26)); img.alpha_composite(two.transpose(Image.FLIP_TOP_BOTTOM), at(34))
 
+# kitchen: counter top (28), counter with stove (23), counter with sink (31), water dispenser facing down (18)
+def counter(i):
+    x0, y0 = at(i)
+    d.rectangle([x0 + 1, y0, x0 + T - 2, y0 + T - 1], fill=(225, 215, 195), outline=(150, 135, 110))
+    return x0, y0
+counter(28)
+x0, y0 = counter(23)
+d.rectangle([x0 + 4, y0 + 4, x0 + T - 5, y0 + T - 5], fill=(45, 45, 50))
+for cx, cy in ((10, 10), (22, 10), (10, 22), (22, 22)):
+    d.ellipse([x0 + cx - 4, y0 + cy - 4, x0 + cx + 4, y0 + cy + 4], outline=(200, 70, 50), width=2)
+x0, y0 = counter(31)
+d.rounded_rectangle([x0 + 6, y0 + 6, x0 + T - 7, y0 + T - 7], radius=4, fill=(200, 210, 220), outline=(130, 140, 150))
+d.ellipse([x0 + 14, y0 + 14, x0 + 18, y0 + 18], fill=(110, 120, 130))
+d.rectangle([x0 + T - 6, y0 + 13, x0 + T - 3, y0 + 19], fill=(160, 165, 170))
+x0, y0 = at(18)
+d.rectangle([x0 + 9, y0 + 12, x0 + 22, y0 + 30], fill=(235, 238, 242), outline=(150, 155, 165))
+d.ellipse([x0 + 8, y0 + 1, x0 + 23, y0 + 14], fill=(140, 195, 235), outline=(90, 140, 190))
+d.rectangle([x0 + 14, y0 + 20, x0 + 17, y0 + 23], fill=(70, 120, 200))
+d.rectangle([x0 + 11, y0 + 25, x0 + 20, y0 + 27], fill=(120, 125, 135))
+
 img.save('tilesets/elunic_custom.png')
