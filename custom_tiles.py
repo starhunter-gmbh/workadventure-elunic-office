@@ -96,4 +96,18 @@ d.ellipse([x0 + 8, y0 + 1, x0 + 23, y0 + 14], fill=(140, 195, 235), outline=(90,
 d.rectangle([x0 + 14, y0 + 20, x0 + 17, y0 + 23], fill=(70, 120, 200))
 d.rectangle([x0 + 11, y0 + 25, x0 + 20, y0 + 27], fill=(120, 125, 135))
 
+# one tall fridge over two tiles (29 top / 37 bottom), seen from above, door facing right into the room
+x0, y0 = at(29)
+d.rounded_rectangle([x0 + 3, y0 + 2, x0 + T - 4, y0 + 2 * T - 3], radius=3, fill=(205, 212, 220), outline=(120, 128, 140))
+d.line([x0 + 4, y0 + 22, x0 + T - 5, y0 + 22], fill=(140, 148, 160))
+d.rectangle([x0 + T - 9, y0 + 8, x0 + T - 7, y0 + 18], fill=(90, 95, 105))
+d.rectangle([x0 + T - 9, y0 + 28, x0 + T - 7, y0 + 50], fill=(90, 95, 105))
+
+# counter with a coffee machine fully on it (39)
+x0, y0 = counter(39)
+d.rectangle([x0 + 7, y0 + 4, x0 + 24, y0 + 26], fill=(40, 40, 45), outline=(20, 20, 22))
+d.rectangle([x0 + 10, y0 + 7, x0 + 21, y0 + 12], fill=(80, 140, 200))
+d.rectangle([x0 + 12, y0 + 16, x0 + 19, y0 + 19], fill=(150, 150, 155))
+d.rectangle([x0 + 13, y0 + 20, x0 + 18, y0 + 25], fill=(245, 245, 240), outline=(120, 90, 60))
+
 img.save('tilesets/elunic_custom.png')

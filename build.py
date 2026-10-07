@@ -231,12 +231,12 @@ obj('furniture1', 34, 17, CUSTOM + 19)
 for y in (14, 15): obj('furniture1', 38, y, 133); obj('furniture1', 39, y, 134)
 stamp(12, 4, 2, 2, 38, 16)
 # kitchen: counter, coffee machine, fridge/printer cabinet
-# kitchen, bottom to top -- left: counter, counter with stove, fridge (2); right: counter with sink / bread / coffee, bin
+# kitchen, bottom to top -- left: counter, counter with stove, one tall fridge; right: counter with sink / bread / coffee, bin
 obj('furniture1', 42, 17, CUSTOM + 28); obj('furniture1', 42, 16, CUSTOM + 23)
-obj('furniture1', 42, 15, 146); obj('furniture1', 42, 14, 136)
+obj('furniture1', 42, 14, CUSTOM + 29); obj('furniture1', 42, 15, CUSTOM + 37)   # one tall fridge
 obj('furniture1', 44, 17, CUSTOM + 31)
 obj('furniture1', 44, 16, CUSTOM + 28); put('furniture2', 44, 16, 203)
-obj('furniture1', 44, 15, CUSTOM + 28); put('furniture2', 44, 15, 165)
+obj('furniture1', 44, 15, CUSTOM + 39)                                 # counter with coffee machine
 obj('furniture1', 44, 14, 169)
 obj('furniture1', 43, 14, CUSTOM + 18)                                 # water dispenser, facing into the room
 # red meeting room
