@@ -331,7 +331,9 @@ for l in layers:
         l['properties'] = [{"name": "startLayer", "type": "bool", "value": True}]
 
 out = copy.deepcopy(src)
-src['tilesets'].append({'firstgid': CUSTOM, 'name': 'elunic_custom', 'image': 'tilesets/elunic_custom.png', 'imageheight': 160, 'imagewidth': 256, 'columns': 8, 'tilecount': 40, 'tileheight': 32, 'tilewidth': 32, 'margin': 0, 'spacing': 0})
+import hashlib
+CUSTOM_VER = hashlib.md5(open(f'{KIT}/tilesets/elunic_custom.png', 'rb').read()).hexdigest()[:8]   # cache-buster
+src['tilesets'].append({'firstgid': CUSTOM, 'name': 'elunic_custom', 'image': f'tilesets/elunic_custom.png?v={CUSTOM_VER}', 'imageheight': 160, 'imagewidth': 256, 'columns': 8, 'tilecount': 40, 'tileheight': 32, 'tilewidth': 32, 'margin': 0, 'spacing': 0})
 out['tilesets'] = src['tilesets']
 out.update(width=W, height=H, layers=layers, nextlayerid=lid[0] + 1, nextobjectid=lid[0] + 1)
 out['properties'] = [
@@ -346,7 +348,7 @@ json.dump(out, open(f'{KIT}/elunic-office.tmj', 'w'))
 img = Image.new('RGBA', (W * 32, H * 32), (0, 0, 0, 255))
 ts = []
 for t in out['tilesets']:
-    ts.append((t['firstgid'], t['columns'], Image.open(f"{KIT}/{t['image']}").convert('RGBA')))
+    ts.append((t['firstgid'], t['columns'], Image.open(f"{KIT}/{t['image'].split('?')[0]}").convert('RGBA')))
 ts.sort()
 cache = {}
 def tile(g):
