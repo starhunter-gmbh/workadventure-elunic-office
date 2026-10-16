@@ -134,6 +134,7 @@ for (x, y) in list(WALL):
         pass  # faces disabled: they ate the top row of every room
 
 # --- stamps copied from the starter-kit office ---
+MISC_FIRST, MISC_END = 109, 219   # WA_Miscellaneous gid range
 FURN = ['furniture1', 'furniture2', 'furniture3', 'above1', 'above2']
 def stamp(sx, sy, w, h, tx, ty, coll=True):
     for dy in range(h):
@@ -142,6 +143,8 @@ def stamp(sx, sy, w, h, tx, ty, coll=True):
             any_t = False
             for n in FURN:
                 g = SRC[n][i]
+                if g and MISC_FIRST <= (g & 0x1FFFFFFF) < MISC_END:
+                    continue   # free desks: drop computers, laptops and mugs (WA_Miscellaneous) from copied furniture
                 if g: put(n, tx + dx, ty + dy, g); any_t = True
             if coll and any_t and SRC['collisions'][i]: put('collisions', tx + dx, ty + dy, COLL)
 
@@ -150,7 +153,8 @@ def stamp_onto(sx, sy, w, tx, ty, layer='furniture3'):
     for dx in range(w):
         i = sy * SW + sx + dx
         for n in FURN:
-            if SRC[n][i]: put(layer, tx + dx, ty, SRC[n][i])
+            g = SRC[n][i]
+            if g and not (MISC_FIRST <= (g & 0x1FFFFFFF) < MISC_END): put(layer, tx + dx, ty, g)
             if SRC['collisions'][i]: put('collisions', tx + dx, ty, COLL)
 
 def obj(layer, x, y, g, coll=True):
@@ -220,7 +224,7 @@ for x in range(14, 19):                                                 # meetin
     c = 0 if x == 14 else 3 if x == 18 else 1
     obj('furniture1', x, 15, 1567 + c); obj('furniture1', x, 16, 1577 + c)
 for x in (14, 16, 18):
-    put('furniture2', x, 14, 1492); put('furniture2', x, 17, 1493); put('furniture2', x, 15, 110)
+    put('furniture2', x, 14, 1492); put('furniture2', x, 17, 1493)
 # WCs: sink at the door, toilets behind the partition wall; men's (right) with 2 urinals on the left wall
 for bx in (30, 34):
     obj('furniture1', bx, 13, 284); obj('furniture1', bx + 2, 13, 284)
@@ -390,3 +394,29 @@ def check():
     return issues, unreach
 issues, unreach = check()
 print('\n'.join(issues)); print('unreachable', len(unreach), sorted(unreach, key=lambda c: (c[1], c[0])))
+
+# --- WAM file for the map storage: every desk seat is a claimable personal area ---
+import uuid
+SEATS = []
+for x in (11, 17):
+    for y in (22, 24, 26, 28):
+        SEATS += [(x, y, 2, 2), (x + 2, y, 2, 2)]
+for x in (22, 26, 30):
+    for y in (26, 28):
+        SEATS += [(x, y, 2, 2), (x + 2, y, 2, 2)]
+SEATS += [(4, 14, 2, 3), (9, 14, 2, 3)]                                  # offices A / B
+SEATS += [(41, 25, 2, 2), (43, 25, 2, 2), (41, 28, 2, 2), (43, 28, 2, 2)]  # right office
+SEATS += [(48, 28, 2, 3)]                                                # small office
+def seat_area(i, x, y, w, h):
+    ns = uuid.UUID('6f0f3c1e-2a7b-4c1e-9d4a-elunic000000'.replace('elunic', '0e1c00'))
+    return {"id": str(uuid.uuid5(ns, f"seat-{i}")), "x": x * 32, "y": y * 32, "width": w * 32, "height": h * 32,
+            "visible": True, "name": f"Arbeitsplatz {i + 1}",
+            "properties": [{"id": str(uuid.uuid5(ns, f"seat-prop-{i}")), "type": "personalAreaPropertyData",
+                            "accessClaimMode": "dynamic", "allowedTags": [], "ownerId": None}]}
+wam = {"version": "1.0.0", "mapUrl": "elunic-office.tmj", "entities": {},
+       "areas": [seat_area(i, *s) for i, s in enumerate(SEATS)],
+       "entityCollections": [{"url": "https://workadventure.starhunter.software/collections/FurnitureCollection.json", "type": "file"},
+                             {"url": "https://workadventure.starhunter.software/collections/OfficeCollection.json", "type": "file"}],
+       "metadata": {"name": "elunic Buero", "description": "elunic Buero mit beanspruchbaren Arbeitsplaetzen"}}
+json.dump(wam, open(f'{KIT}/elunic-office.wam', 'w'), indent=1)
+print('wam seats', len(SEATS))
