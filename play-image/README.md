@@ -14,3 +14,7 @@ Build (needs ~8 GB heap, sourcemaps off; the ACR build agent runs out of memory)
     docker push crstarhunter.azurecr.io/workadventure:play-elunic-1
 
 Pushed digest: `sha256:f509e8d5cd0d139e9cc0f30adf28d62d94fe19535ee901071106e33d542ee28a`
+
+> **Superseded.** The deployed image is built from `starhunter/gitlab-ops-old-production-eu1-cluster`,
+> `dockerfiles/workadventure-play/` (secure-auth) + `dockerfiles/workadventure-play/frontend/` (claim dialog),
+> image `play-eleiva-secure-auth-claim-2`. This folder is kept only as history.
