@@ -1,0 +1,29 @@
+{
+ "collectionName": "elunic",
+ "tags": [
+  "furniture",
+  "electronic"
+ ],
+ "collection": [
+  {
+   "name": "Bildschirm (seitlich)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenLeft.png",
+   "direction": "Left",
+   "color": "black"
+  },
+  {
+   "name": "Bildschirm (seitlich)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenRight.png",
+   "direction": "Right",
+   "color": "black"
+  }
+ ]
+}
