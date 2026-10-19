@@ -34,11 +34,11 @@ WA.onInit().then(async () => {
 });
 
 // --- calendar meetings: during an accepted meeting, walk to the seat the wa-calendar service assigned, set
-// "Do not disturb", and walk back + restore the previous status when the meeting ends. Logged-in users only.
+// "Do not disturb", and walk back + restore the previous status when the meeting ends. Meetings need a logged-in
+// user (token); every player, anonymous ones included, pings so the service can list who is on the map.
 WA.onInit().then(() => {
     let token;
     try { token = WA.player.userRoomToken; } catch (e) { token = undefined; }
-    if (!token) return;
     const api = new URL("/calendar-api/presence", WA.room.mapURL).toString();
     const status = (action) => window.parent.postMessage({ type: "elunic-status", action }, "*");
     const go = async (x, y) => {
@@ -55,7 +55,8 @@ WA.onInit().then(() => {
         if (busy) return;
         busy = true;
         try {
-            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+            const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid };
+            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
             if (!res.ok) return;
             const meeting = (await res.json()).meeting;
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
