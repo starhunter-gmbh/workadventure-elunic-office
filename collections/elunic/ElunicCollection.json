@@ -24,6 +24,166 @@
    "imagePath": "ScreenRight.png",
    "direction": "Right",
    "color": "black"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenBlackDown.png",
+   "direction": "Down",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenBlackUp.png",
+   "direction": "Up",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenBlackLeft.png",
+   "direction": "Left",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenBlackRight.png",
+   "direction": "Right",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenWhiteDown.png",
+   "direction": "Down",
+   "color": "white"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenWhiteUp.png",
+   "direction": "Up",
+   "color": "white"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenWhiteLeft.png",
+   "direction": "Left",
+   "color": "white"
+  },
+  {
+   "name": "Computer Screen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "ScreenWhiteRight.png",
+   "direction": "Right",
+   "color": "white"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenBlackDown.png",
+   "direction": "Down",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenBlackUp.png",
+   "direction": "Up",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenBlackLeft.png",
+   "direction": "Left",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenBlackRight.png",
+   "direction": "Right",
+   "color": "black"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenWhiteDown.png",
+   "direction": "Down",
+   "color": "white"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenWhiteUp.png",
+   "direction": "Up",
+   "color": "white"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenWhiteLeft.png",
+   "direction": "Left",
+   "color": "white"
+  },
+  {
+   "name": "Computer Screen (Big)",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "BigScreenWhiteRight.png",
+   "direction": "Right",
+   "color": "white"
   }
  ]
 }
