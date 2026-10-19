@@ -338,7 +338,12 @@ for l in layers:
 out = copy.deepcopy(src)
 import hashlib
 CUSTOM_VER = hashlib.md5(open(f'{KIT}/tilesets/elunic_custom.png', 'rb').read()).hexdigest()[:8]   # cache-buster
-src['tilesets'].append({'firstgid': CUSTOM, 'name': 'elunic_custom', 'image': f'tilesets/elunic_custom.png?v={CUSTOM_VER}', 'imageheight': 224, 'imagewidth': 256, 'columns': 8, 'tilecount': 56, 'tileheight': 32, 'tilewidth': 32, 'margin': 0, 'spacing': 0})
+# versioned file name instead of ?v= (the map storage rejects query strings in tileset paths)
+import glob, shutil, os
+for old in glob.glob(f'{KIT}/tilesets/elunic_custom-*.png'):
+    os.remove(old)
+shutil.copy(f'{KIT}/tilesets/elunic_custom.png', f'{KIT}/tilesets/elunic_custom-{CUSTOM_VER}.png')
+src['tilesets'].append({'firstgid': CUSTOM, 'name': 'elunic_custom', 'image': f'tilesets/elunic_custom-{CUSTOM_VER}.png', 'imageheight': 224, 'imagewidth': 256, 'columns': 8, 'tilecount': 56, 'tileheight': 32, 'tilewidth': 32, 'margin': 0, 'spacing': 0})
 out['tilesets'] = src['tilesets']
 out.update(width=W, height=H, layers=layers, nextlayerid=lid[0] + 1, nextobjectid=lid[0] + 1)
 out['properties'] = [
