@@ -124,4 +124,9 @@ d.ellipse([x0 + 22, y0 + 23, x0 + 41, y0 + 42], fill=(222, 182, 80), outline=(16
 d.ellipse([x0 + 28, y0 + 29, x0 + 35, y0 + 36], fill=(150, 108, 30))
 d.line([x0 + 50, y0 + 40, x0 + 58, y0 + 56], fill=dark, width=2); d.ellipse([x0 + 46, y0 + 36, x0 + 52, y0 + 42], fill=(200, 60, 50))  # mallet
 
+# small gong: the 2x2 gong scaled into one tile (42)
+big = img.crop((at(40)[0], at(40)[1], at(40)[0] + 2 * T, at(40)[1] + 2 * T))
+img.paste(Image.new('RGBA', (T, T), (0, 0, 0, 0)), at(42))
+img.alpha_composite(big.resize((T, T), Image.LANCZOS), at(42))
+
 img.save('tilesets/elunic_custom.png')
