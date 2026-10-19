@@ -49,26 +49,34 @@ WA.onInit().then(() => {
             await WA.player.teleport(x, y).catch(() => {});
         }
     };
-    let active = null;   // { key, x, y, back: {x, y} }
+    let active = null;   // { key, x, y, endsAt, back: {x, y} }
     let busy = false;
+    async function leave() {
+        const back = active.back;
+        active = null;
+        await go(back.x, back.y);
+        status("restore");
+    }
     async function tick() {
         if (busy) return;
         busy = true;
         try {
             const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid };
-            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-            if (!res.ok) return;
+            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+                .catch(() => null);
+            if (!res || !res.ok) {
+                // Service unreachable: still end a meeting on time, but never start or move one.
+                if (active && Date.now() >= active.endsAt) await leave();
+                return;
+            }
             const meeting = (await res.json()).meeting;
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
                 const back = active ? active.back : await WA.player.getPosition();
-                active = { key: meeting.key, x: meeting.x, y: meeting.y, back };
+                active = { key: meeting.key, x: meeting.x, y: meeting.y, endsAt: meeting.endsAt, back };
                 status("dnd");
                 await go(meeting.x, meeting.y);
             } else if (!meeting && active) {
-                const back = active.back;
-                active = null;
-                await go(back.x, back.y);
-                status("restore");
+                await leave();
             }
         } catch (e) {
             console.warn("elunic calendar", e);
