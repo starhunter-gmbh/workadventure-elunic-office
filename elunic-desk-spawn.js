@@ -32,7 +32,7 @@ function ringGong(from, message) {
     });
 }
 WA.onInit().then(() => {
-    WA.room.area.create({ name: "elunic-gong", x: 23 * 32, y: 8 * 32, width: 4 * 32, height: 3 * 32 });
+    WA.room.area.create({ name: "elunic-gong", x: 39 * 32, y: 19 * 32, width: 5 * 32, height: 2 * 32 });
     let action;
     WA.room.area.onEnter("elunic-gong").subscribe(() => {
         action = WA.ui.displayActionMessage({

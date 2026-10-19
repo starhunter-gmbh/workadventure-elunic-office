@@ -202,7 +202,9 @@ stamp(10, 4, 1, 1, 18, 12, coll=False); stamp(10, 4, 1, 1, 21, 12, coll=False)
 for y, g in zip(range(9, 15), (1627, 1637, 1647, 1647, 1657, 1667)):   # long table along the right wall
     obj('furniture1', 28, y, g)
 block(22, 15, 2, 2, PINGPONG)
-block(24, 8, 2, 2, CUSTOM + 40)                                       # gong (see elunic-desk-spawn.js / gong.html)
+# gong in the corridor below the kitchen, against the wall of the 4-desk office, left of its door;
+# only the bottom row blocks, so the corridor and the kitchen door stay passable
+block(41, 19, 2, 1, CUSTOM + 40, coll=False); block(41, 20, 2, 1, CUSTOM + 48)   # see elunic-desk-spawn.js / gong.html
 # left balcony
 stamp(*OUT_TABLE, 7, 10)
 plant_big(3, 11)
@@ -471,7 +473,7 @@ function ringGong(from, message) {
     });
 }
 WA.onInit().then(() => {
-    WA.room.area.create({ name: "elunic-gong", x: 23 * 32, y: 8 * 32, width: 4 * 32, height: 3 * 32 });
+    WA.room.area.create({ name: "elunic-gong", x: 39 * 32, y: 19 * 32, width: 5 * 32, height: 2 * 32 });
     let action;
     WA.room.area.onEnter("elunic-gong").subscribe(() => {
         action = WA.ui.displayActionMessage({
