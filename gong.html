@@ -19,15 +19,23 @@
 </head>
 <body>
 <form id="f">
-  <h1>Gong schlagen</h1>
-  <textarea id="msg" maxlength="200" placeholder="Nachricht an alle im Büro" required autofocus></textarea>
-  <small>Alle im Büro hören den Gong und sehen deine Nachricht.</small>
+  <h1 id="title">Hit the gong</h1>
+  <textarea id="msg" maxlength="200" placeholder="Message to everyone in the office" required autofocus></textarea>
+  <small id="hint">Everyone in the office hears the gong and sees your message.</small>
   <div class="row">
-    <button type="button" class="secondary" id="cancel">Abbrechen</button>
-    <button type="submit" class="primary">Gong!</button>
+    <button type="button" class="secondary" id="cancel">Cancel</button>
+    <button type="submit" class="primary" id="send">Gong!</button>
   </div>
 </form>
 <script>
+// Browser language: German for "de*", English otherwise (labels and the sender's own banner).
+if ((navigator.language || "").toLowerCase().startsWith("de")) {
+  document.documentElement.lang = "de";
+  document.getElementById("title").textContent = "Gong schlagen";
+  document.getElementById("msg").placeholder = "Nachricht an alle im Büro";
+  document.getElementById("hint").textContent = "Alle im Büro hören den Gong und sehen deine Nachricht.";
+  document.getElementById("cancel").textContent = "Abbrechen";
+}
 WA.onInit().then(() => {
   const close = () => WA.ui.modal.closeModal();
   document.getElementById("cancel").onclick = close;
@@ -35,11 +43,11 @@ WA.onInit().then(() => {
     e.preventDefault();
     const message = document.getElementById("msg").value.trim().slice(0, 200);
     if (!message) return;
-    const from = WA.player.name || "Jemand";
+    const from = WA.player.name || "Someone";
     await WA.event.broadcast("elunic-gong", { from, message });
     // ring locally for the sender
     try { WA.sound.loadSound(new URL("elunic-gong.ogg", location.href).toString()).play({ volume: 0.7, loop: false }); } catch (err) { console.warn(err); }
-    WA.ui.banner.openBanner({ id: "elunic-gong", text: from + " hit the gong: " + message, bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000 });
+    WA.ui.banner.openBanner({ id: "elunic-gong", text: ((navigator.language || "").toLowerCase().startsWith("de") ? from + " hat den Gong geschlagen: " : from + " hit the gong: ") + message, bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000 });
     close();
   };
 });

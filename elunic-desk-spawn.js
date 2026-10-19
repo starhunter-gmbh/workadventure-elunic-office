@@ -37,10 +37,16 @@ WA.onInit().then(async () => {
 const GONG_EVENT = "elunic-gong";
 // WA.room.mapURL is only available after WA.onInit(), so resolve URLs lazily.
 const gongSound = () => new URL("elunic-gong.ogg", WA.room.mapURL).toString();
+// Banner in the receiver's browser language: German for "de*", English otherwise.
+function gongText(from, message) {
+    return (navigator.language || "").toLowerCase().startsWith("de")
+        ? from + " hat den Gong geschlagen: " + message
+        : from + " hit the gong: " + message;
+}
 function ringGong(from, message) {
     try { WA.sound.loadSound(gongSound()).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
     WA.ui.banner.openBanner({
-        id: "elunic-gong", text: from + " hit the gong: " + message,
+        id: "elunic-gong", text: gongText(from, message),
         bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,
     });
 }
@@ -49,7 +55,8 @@ WA.onInit().then(() => {
     let action;
     WA.room.area.onEnter("elunic-gong").subscribe(() => {
         action = WA.ui.displayActionMessage({
-            message: "Leertaste: Gong schlagen",
+            // Browser language: German for "de*", English otherwise.
+            message: (navigator.language || "").toLowerCase().startsWith("de") ? "Leertaste: Gong schlagen" : "Space: hit the gong",
             callback: () => WA.ui.modal.openModal({
                 src: new URL("gong.html", WA.room.mapURL).toString(),
                 title: "Gong", position: "center", allowApi: true, allow: "autoplay",
