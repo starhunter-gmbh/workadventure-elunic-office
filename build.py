@@ -429,6 +429,34 @@ wam = {"version": "1.0.0", "mapUrl": "elunic-office.tmj", "entities": {},
        "metadata": {"name": "elunic Buero", "description": "elunic Buero mit beanspruchbaren Arbeitsplaetzen"}}
 json.dump(wam, open(f'{KIT}/elunic-office.wam', 'w'), indent=1)
 
+# --- conference rooms for the calendar service (wa-calendar): seats (chairs/sofa tiles) and standing tiles ---
+CONF_ROOMS = [   # id, label, interior rectangle in tiles (x0, y0, x1, y1)
+    ("conference-big", "Großer Konfi", (15, 1, 23, 5)),
+    ("conference-small", "Kleiner Konfi", (13, 14, 19, 17)),
+    ("balcony-right-table", "Balkon rechts, Tisch", (45, 9, 51, 12)),
+    ("balcony-right-lounge", "Balkon rechts, Couch-Ecke", (37, 9, 44, 12)),
+    ("balcony-left", "Balkon links", (1, 9, 13, 12)),   # stools stand directly above each other: no armchair merge
+    ("office-bottom-right", "Büro rechts unten", (48, 22, 51, 30)),
+    ("office-a", "Büro A", (2, 14, 6, 17)),
+    ("office-b", "Büro B", (8, 14, 11, 17)),
+]
+def is_seat(x, y):
+    return not get('collisions', x, y) and any(SEAT_FIRST <= (get(n, x, y) & 0x1FFFFFFF) < SEAT_END for n in FURN)
+SEAT_FIRST, SEAT_END = 1375, 1557   # WA_Seats gid range
+rooms = []
+for rid, label, (x0, y0, x1, y1) in CONF_ROOMS:
+    merge = rid != "balcony-left"
+    seats = [(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)
+             if is_seat(x, y) and not (merge and y < y1 and is_seat(x, y + 1))]   # multi-tile armchairs count once (lower tile)
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    standing = sorted(((x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)
+                       if inside[y][x] and not get('collisions', x, y) and (x, y) not in seats and not is_seat(x, y)),
+                      key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2)
+    px = lambda p: [p[0] * 32 + 16, p[1] * 32 + 16]
+    rooms.append({"id": rid, "label": label, "seats": [px(p) for p in seats], "standing": [px(p) for p in standing]})
+json.dump({"rooms": rooms}, open(f'{KIT}/elunic-rooms.json', 'w'), indent=1)
+print('rooms', [(r["id"], len(r["seats"]), len(r["standing"])) for r in rooms])
+
 # --- desk spawn: map script that teleports a player to the chair of the desk they claimed ---
 SEAT_FIRST, SEAT_END = 1375, 1557   # WA_Seats gid range
 def chair_of(x, y, w, h):
@@ -472,6 +500,52 @@ WA.onInit().then(async () => {
     } finally {
         console.info("[elunic] desk spawn: " + dbg.join(" | "));
     }
+});
+
+// --- calendar meetings: during an accepted meeting, walk to the seat the wa-calendar service assigned, set
+// "Do not disturb", and walk back + restore the previous status when the meeting ends. Logged-in users only.
+WA.onInit().then(() => {
+    let token;
+    try { token = WA.player.userRoomToken; } catch (e) { token = undefined; }
+    if (!token) return;
+    const api = new URL("/calendar-api/presence", WA.room.mapURL).toString();
+    const status = (action) => window.parent.postMessage({ type: "elunic-status", action }, "*");
+    const go = async (x, y) => {
+        try {
+            const r = await WA.player.moveTo(x, y, 10);
+            if (r && r.cancelled) await WA.player.teleport(x, y);
+        } catch (e) {
+            await WA.player.teleport(x, y).catch(() => {});
+        }
+    };
+    let active = null;   // { key, x, y, back: {x, y} }
+    let busy = false;
+    async function tick() {
+        if (busy) return;
+        busy = true;
+        try {
+            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+            if (!res.ok) return;
+            const meeting = (await res.json()).meeting;
+            if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
+                const back = active ? active.back : await WA.player.getPosition();
+                active = { key: meeting.key, x: meeting.x, y: meeting.y, back };
+                status("dnd");
+                await go(meeting.x, meeting.y);
+            } else if (!meeting && active) {
+                const back = active.back;
+                active = null;
+                await go(back.x, back.y);
+                status("restore");
+            }
+        } catch (e) {
+            console.warn("elunic calendar", e);
+        } finally {
+            busy = false;
+        }
+    }
+    setTimeout(tick, 4000);          // after the desk spawn has placed the player
+    setInterval(tick, 30000);
 });
 
 // --- gong: walk up to it, press space, enter a message; everybody in the room hears it and sees a banner ---

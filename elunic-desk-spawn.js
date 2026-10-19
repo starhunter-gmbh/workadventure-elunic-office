@@ -33,6 +33,52 @@ WA.onInit().then(async () => {
     }
 });
 
+// --- calendar meetings: during an accepted meeting, walk to the seat the wa-calendar service assigned, set
+// "Do not disturb", and walk back + restore the previous status when the meeting ends. Logged-in users only.
+WA.onInit().then(() => {
+    let token;
+    try { token = WA.player.userRoomToken; } catch (e) { token = undefined; }
+    if (!token) return;
+    const api = new URL("/calendar-api/presence", WA.room.mapURL).toString();
+    const status = (action) => window.parent.postMessage({ type: "elunic-status", action }, "*");
+    const go = async (x, y) => {
+        try {
+            const r = await WA.player.moveTo(x, y, 10);
+            if (r && r.cancelled) await WA.player.teleport(x, y);
+        } catch (e) {
+            await WA.player.teleport(x, y).catch(() => {});
+        }
+    };
+    let active = null;   // { key, x, y, back: {x, y} }
+    let busy = false;
+    async function tick() {
+        if (busy) return;
+        busy = true;
+        try {
+            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+            if (!res.ok) return;
+            const meeting = (await res.json()).meeting;
+            if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
+                const back = active ? active.back : await WA.player.getPosition();
+                active = { key: meeting.key, x: meeting.x, y: meeting.y, back };
+                status("dnd");
+                await go(meeting.x, meeting.y);
+            } else if (!meeting && active) {
+                const back = active.back;
+                active = null;
+                await go(back.x, back.y);
+                status("restore");
+            }
+        } catch (e) {
+            console.warn("elunic calendar", e);
+        } finally {
+            busy = false;
+        }
+    }
+    setTimeout(tick, 4000);          // after the desk spawn has placed the player
+    setInterval(tick, 30000);
+});
+
 // --- gong: walk up to it, press space, enter a message; everybody in the room hears it and sees a banner ---
 const GONG_EVENT = "elunic-gong";
 // WA.room.mapURL is only available after WA.onInit(), so resolve URLs lazily.
