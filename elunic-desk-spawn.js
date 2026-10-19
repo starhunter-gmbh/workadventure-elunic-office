@@ -3,29 +3,42 @@
 const SPAWNS = {"164bd138-3fe6-548b-ae2f-dce146312927": [368, 720], "8afde150-a0b5-581c-9f8d-71ae945bdd60": [464, 720], "f6a23e1c-63c8-5e08-806e-34169802d65d": [368, 784], "a6e2505a-3185-50ef-806c-4391737e07a5": [464, 784], "97e1dc15-4fea-56ce-9bb7-38d58edd076d": [368, 848], "dff13515-edf1-5f35-acda-5eaeb17fb4a4": [464, 848], "9ae7dfe4-700b-582c-a57e-ef1514fea03c": [368, 912], "e18f0dfb-77e5-5161-a78f-bb9edc0433f1": [464, 912], "14643efe-0f6b-58f7-a1ff-0f2afb6ff19f": [560, 720], "113a32cc-9edd-5107-9608-4a1251554679": [656, 720], "2a8e23dc-9cc8-5005-9c47-79cd481ed3cd": [560, 784], "aa580281-5771-547c-b483-ac2fa80e4b26": [656, 784], "af7f58eb-1afc-5c0b-9cc3-452677088205": [560, 848], "450609fd-01f2-5f22-b656-d8401ca4265f": [656, 848], "ec12f490-0bf0-51d7-9b9b-6f525391467c": [560, 912], "30d0ee37-e03d-56b3-b5e3-eba03154fc6b": [656, 912], "8bac6a11-b343-575d-9ddd-d2ad69a05944": [720, 848], "f873e501-d531-5ea1-aaa8-15f95b9cb8f2": [816, 848], "36be4b67-839a-5592-a2fa-fb1473056b0f": [720, 912], "5aed9896-d965-58a6-b6f0-5e713eb71172": [816, 912], "c1c618b6-d554-554b-af4e-5cc87627ddff": [848, 848], "4a53bfed-19d0-5f64-a129-392755103084": [944, 848], "d9736064-eb4c-5cf7-8955-1ced3bd2dde8": [848, 912], "e3f18364-0da5-5aea-9666-ea8302dedecb": [944, 912], "6d4185cd-944f-58ea-995c-51236f3037be": [976, 848], "ccf8fb6e-d16c-55ac-a20d-2fe5dfc82fb7": [1072, 848], "463b9adc-a175-5799-b095-186566bb1d3d": [976, 912], "649a4fd3-32b4-5674-9b5b-075c0a0df1e9": [1072, 912], "18435dd2-b186-5498-ae36-c0a9afc6fe2b": [144, 496], "9fa9771b-ee14-5a34-85c0-9812f2dc6cc7": [304, 496], "47109bd6-0719-5755-838e-855906933cc6": [1328, 816], "ec9f0b1b-b5cf-5290-b3b5-453f87942534": [1392, 816], "b4897a0a-6a05-57ac-a712-01ca804047a5": [1328, 944], "b52de8cf-c827-59ac-8c42-c71ca087adb9": [1392, 944], "9d3b784f-3058-5868-a197-8fc2ea288a48": [1584, 944]};
 
 WA.onInit().then(async () => {
+    const dbg = [];
     try {
         // An explicit position in the link (e.g. #start-area) wins.
-        if (Object.keys(WA.room.hashParameters || {}).length > 0) return;
+        const hash = WA.room.hashParameters || {};
         const uuid = WA.player.uuid;
+        dbg.push("uuid=" + uuid, "hashKeys=" + Object.keys(hash).join(","));
+        // Only a real position in the link (non-empty hash value, e.g. #start-area) wins over the desk.
+        if (Object.values(hash).some((v) => v !== undefined && v !== null && v !== "")) return;
         if (!uuid) return;
         const wamUrl = new URL("elunic-office.wam", WA.room.mapURL).toString();
-        const wam = await (await fetch(wamUrl, { cache: "no-store" })).json();
+        dbg.push("wam=" + wamUrl);
+        const res = await fetch(wamUrl, { cache: "no-store" });
+        dbg.push("status=" + res.status);
+        const wam = await res.json();
         const own = (wam.areas || []).find((area) =>
             (area.properties || []).some((p) => p.type === "personalAreaPropertyData" && p.ownerId === uuid)
         );
+        dbg.push("own=" + (own ? own.name : "none"));
         if (!own) return;
         const spawn = SPAWNS[own.id] || [own.x + own.width / 2, own.y + own.height / 2];
         await WA.player.teleport(spawn[0], spawn[1]);
+        dbg.push("teleported");
     } catch (e) {
         console.warn("elunic desk spawn failed", e);
+        dbg.push("error=" + e);
+    } finally {
+        console.info("[elunic] desk spawn: " + dbg.join(" | "));
     }
 });
 
 // --- gong: walk up to it, press space, enter a message; everybody in the room hears it and sees a banner ---
 const GONG_EVENT = "elunic-gong";
-const GONG_SOUND = new URL("elunic-gong.ogg", WA.room.mapURL).toString();
+// WA.room.mapURL is only available after WA.onInit(), so resolve URLs lazily.
+const gongSound = () => new URL("elunic-gong.ogg", WA.room.mapURL).toString();
 function ringGong(from, message) {
-    try { WA.sound.loadSound(GONG_SOUND).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
+    try { WA.sound.loadSound(gongSound()).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
     WA.ui.banner.openBanner({
         id: "elunic-gong", text: "Gong von " + from + ": " + message,
         bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,

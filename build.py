@@ -444,29 +444,42 @@ open(f'{KIT}/elunic-desk-spawn.js', 'w').write("""// elunic: on room entry, put 
 const SPAWNS = """ + json.dumps(spawns) + """;
 
 WA.onInit().then(async () => {
+    const dbg = [];
     try {
         // An explicit position in the link (e.g. #start-area) wins.
-        if (Object.keys(WA.room.hashParameters || {}).length > 0) return;
+        const hash = WA.room.hashParameters || {};
         const uuid = WA.player.uuid;
+        dbg.push("uuid=" + uuid, "hashKeys=" + Object.keys(hash).join(","));
+        // Only a real position in the link (non-empty hash value, e.g. #start-area) wins over the desk.
+        if (Object.values(hash).some((v) => v !== undefined && v !== null && v !== "")) return;
         if (!uuid) return;
         const wamUrl = new URL("elunic-office.wam", WA.room.mapURL).toString();
-        const wam = await (await fetch(wamUrl, { cache: "no-store" })).json();
+        dbg.push("wam=" + wamUrl);
+        const res = await fetch(wamUrl, { cache: "no-store" });
+        dbg.push("status=" + res.status);
+        const wam = await res.json();
         const own = (wam.areas || []).find((area) =>
             (area.properties || []).some((p) => p.type === "personalAreaPropertyData" && p.ownerId === uuid)
         );
+        dbg.push("own=" + (own ? own.name : "none"));
         if (!own) return;
         const spawn = SPAWNS[own.id] || [own.x + own.width / 2, own.y + own.height / 2];
         await WA.player.teleport(spawn[0], spawn[1]);
+        dbg.push("teleported");
     } catch (e) {
         console.warn("elunic desk spawn failed", e);
+        dbg.push("error=" + e);
+    } finally {
+        console.info("[elunic] desk spawn: " + dbg.join(" | "));
     }
 });
 
 // --- gong: walk up to it, press space, enter a message; everybody in the room hears it and sees a banner ---
 const GONG_EVENT = "elunic-gong";
-const GONG_SOUND = new URL("elunic-gong.ogg", WA.room.mapURL).toString();
+// WA.room.mapURL is only available after WA.onInit(), so resolve URLs lazily.
+const gongSound = () => new URL("elunic-gong.ogg", WA.room.mapURL).toString();
 function ringGong(from, message) {
-    try { WA.sound.loadSound(GONG_SOUND).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
+    try { WA.sound.loadSound(gongSound()).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
     WA.ui.banner.openBanner({
         id: "elunic-gong", text: "Gong von " + from + ": " + message,
         bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,
