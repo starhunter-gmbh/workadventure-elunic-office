@@ -2,7 +2,7 @@
 from PIL import Image, ImageDraw
 
 T = 32
-COLS, ROWS = 8, 5
+COLS, ROWS = 8, 7
 img = Image.new('RGBA', (COLS * T, ROWS * T), (0, 0, 0, 0))
 d = ImageDraw.Draw(img)
 
@@ -109,5 +109,19 @@ d.rectangle([x0 + 7, y0 + 4, x0 + 24, y0 + 26], fill=(40, 40, 45), outline=(20, 
 d.rectangle([x0 + 10, y0 + 7, x0 + 21, y0 + 12], fill=(80, 140, 200))
 d.rectangle([x0 + 12, y0 + 16, x0 + 19, y0 + 19], fill=(150, 150, 155))
 d.rectangle([x0 + 13, y0 + 20, x0 + 18, y0 + 25], fill=(245, 245, 240), outline=(120, 90, 60))
+
+# gong on a wooden frame, 2x2 at tiles 40-41 / 48-49
+x0, y0 = at(40)
+wood, dark = (120, 78, 40), (70, 45, 22)
+d.rectangle([x0 + 4, y0 + 6, x0 + 7, y0 + 2 * T - 2], fill=wood, outline=dark)            # left post
+d.rectangle([x0 + 2 * T - 8, y0 + 6, x0 + 2 * T - 5, y0 + 2 * T - 2], fill=wood, outline=dark)  # right post
+d.rectangle([x0 + 2, y0 + 3, x0 + 2 * T - 3, y0 + 8], fill=wood, outline=dark)             # top beam
+d.rectangle([x0 + 1, y0 + 2 * T - 4, x0 + 12, y0 + 2 * T - 1], fill=dark)                 # feet
+d.rectangle([x0 + 2 * T - 13, y0 + 2 * T - 4, x0 + 2 * T - 2, y0 + 2 * T - 1], fill=dark)
+d.line([x0 + 26, y0 + 8, x0 + 26, y0 + 14], fill=(40, 40, 40)); d.line([x0 + 37, y0 + 8, x0 + 37, y0 + 14], fill=(40, 40, 40))
+d.ellipse([x0 + 12, y0 + 13, x0 + 51, y0 + 52], fill=(196, 150, 52), outline=(120, 85, 20), width=2)  # bronze disc
+d.ellipse([x0 + 22, y0 + 23, x0 + 41, y0 + 42], fill=(222, 182, 80), outline=(160, 118, 40))
+d.ellipse([x0 + 28, y0 + 29, x0 + 35, y0 + 36], fill=(150, 108, 30))
+d.line([x0 + 50, y0 + 40, x0 + 58, y0 + 56], fill=dark, width=2); d.ellipse([x0 + 46, y0 + 36, x0 + 52, y0 + 42], fill=(200, 60, 50))  # mallet
 
 img.save('tilesets/elunic_custom.png')

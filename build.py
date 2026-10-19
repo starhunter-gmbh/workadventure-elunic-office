@@ -202,6 +202,7 @@ stamp(10, 4, 1, 1, 18, 12, coll=False); stamp(10, 4, 1, 1, 21, 12, coll=False)
 for y, g in zip(range(9, 15), (1627, 1637, 1647, 1647, 1657, 1667)):   # long table along the right wall
     obj('furniture1', 28, y, g)
 block(22, 15, 2, 2, PINGPONG)
+block(24, 8, 2, 2, CUSTOM + 40)                                       # gong (see elunic-desk-spawn.js / gong.html)
 # left balcony
 stamp(*OUT_TABLE, 7, 10)
 plant_big(3, 11)
@@ -337,7 +338,7 @@ for l in layers:
 out = copy.deepcopy(src)
 import hashlib
 CUSTOM_VER = hashlib.md5(open(f'{KIT}/tilesets/elunic_custom.png', 'rb').read()).hexdigest()[:8]   # cache-buster
-src['tilesets'].append({'firstgid': CUSTOM, 'name': 'elunic_custom', 'image': f'tilesets/elunic_custom.png?v={CUSTOM_VER}', 'imageheight': 160, 'imagewidth': 256, 'columns': 8, 'tilecount': 40, 'tileheight': 32, 'tilewidth': 32, 'margin': 0, 'spacing': 0})
+src['tilesets'].append({'firstgid': CUSTOM, 'name': 'elunic_custom', 'image': f'tilesets/elunic_custom.png?v={CUSTOM_VER}', 'imageheight': 224, 'imagewidth': 256, 'columns': 8, 'tilecount': 56, 'tileheight': 32, 'tilewidth': 32, 'margin': 0, 'spacing': 0})
 out['tilesets'] = src['tilesets']
 out.update(width=W, height=H, layers=layers, nextlayerid=lid[0] + 1, nextobjectid=lid[0] + 1)
 out['properties'] = [
@@ -452,6 +453,37 @@ WA.onInit().then(async () => {
     } catch (e) {
         console.warn("elunic desk spawn failed", e);
     }
+});
+
+// --- gong: walk up to it, press space, enter a message; everybody in the room hears it and sees a banner ---
+const GONG_EVENT = "elunic-gong";
+const GONG_SOUND = new URL("elunic-gong.ogg", WA.room.mapURL).toString();
+function ringGong(from, message) {
+    try { WA.sound.loadSound(GONG_SOUND).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
+    WA.ui.banner.openBanner({
+        id: "elunic-gong", text: "Gong von " + from + ": " + message,
+        bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,
+    });
+}
+WA.onInit().then(() => {
+    WA.room.area.create({ name: "elunic-gong", x: 23 * 32, y: 8 * 32, width: 4 * 32, height: 3 * 32 });
+    let action;
+    WA.room.area.onEnter("elunic-gong").subscribe(() => {
+        action = WA.ui.displayActionMessage({
+            message: "Leertaste: Gong schlagen",
+            callback: () => WA.ui.modal.openModal({
+                src: new URL("gong.html", WA.room.mapURL).toString(),
+                title: "Gong", position: "center", allowApi: true, allow: "autoplay",
+            }),
+        });
+    });
+    WA.room.area.onLeave("elunic-gong").subscribe(() => { if (action) action.remove(); action = undefined; });
+    // Senders ring locally in gong.html; skip our own echo if the server reflects it.
+    WA.event.on(GONG_EVENT).subscribe((ev) => {
+        if (ev.senderId !== undefined && ev.senderId === WA.player.playerId) return;
+        const d = ev.data || {};
+        ringGong(String(d.from || "?"), String(d.message || "").slice(0, 200));
+    });
 });
 """)
 print('spawns', len(spawns))

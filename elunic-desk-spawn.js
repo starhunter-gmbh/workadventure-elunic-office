@@ -20,3 +20,34 @@ WA.onInit().then(async () => {
         console.warn("elunic desk spawn failed", e);
     }
 });
+
+// --- gong: walk up to it, press space, enter a message; everybody in the room hears it and sees a banner ---
+const GONG_EVENT = "elunic-gong";
+const GONG_SOUND = new URL("elunic-gong.ogg", WA.room.mapURL).toString();
+function ringGong(from, message) {
+    try { WA.sound.loadSound(GONG_SOUND).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
+    WA.ui.banner.openBanner({
+        id: "elunic-gong", text: "Gong von " + from + ": " + message,
+        bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,
+    });
+}
+WA.onInit().then(() => {
+    WA.room.area.create({ name: "elunic-gong", x: 23 * 32, y: 8 * 32, width: 4 * 32, height: 3 * 32 });
+    let action;
+    WA.room.area.onEnter("elunic-gong").subscribe(() => {
+        action = WA.ui.displayActionMessage({
+            message: "Leertaste: Gong schlagen",
+            callback: () => WA.ui.modal.openModal({
+                src: new URL("gong.html", WA.room.mapURL).toString(),
+                title: "Gong", position: "center", allowApi: true, allow: "autoplay",
+            }),
+        });
+    });
+    WA.room.area.onLeave("elunic-gong").subscribe(() => { if (action) action.remove(); action = undefined; });
+    // Senders ring locally in gong.html; skip our own echo if the server reflects it.
+    WA.event.on(GONG_EVENT).subscribe((ev) => {
+        if (ev.senderId !== undefined && ev.senderId === WA.player.playerId) return;
+        const d = ev.data || {};
+        ringGong(String(d.from || "?"), String(d.message || "").slice(0, 200));
+    });
+});
