@@ -39,7 +39,7 @@ WA.onInit().then(() => {
     await WA.event.broadcast("elunic-gong", { from, message });
     // ring locally for the sender
     try { WA.sound.loadSound(new URL("elunic-gong.ogg", location.href).toString()).play({ volume: 0.7, loop: false }); } catch (err) { console.warn(err); }
-    WA.ui.banner.openBanner({ id: "elunic-gong", text: "Gong von " + from + ": " + message, bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000 });
+    WA.ui.banner.openBanner({ id: "elunic-gong", text: from + " hit the gong: " + message, bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000 });
     close();
   };
 });

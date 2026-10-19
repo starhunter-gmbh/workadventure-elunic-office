@@ -40,7 +40,7 @@ const gongSound = () => new URL("elunic-gong.ogg", WA.room.mapURL).toString();
 function ringGong(from, message) {
     try { WA.sound.loadSound(gongSound()).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
     WA.ui.banner.openBanner({
-        id: "elunic-gong", text: "Gong von " + from + ": " + message,
+        id: "elunic-gong", text: from + " hit the gong: " + message,
         bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,
     });
 }
