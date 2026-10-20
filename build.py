@@ -582,14 +582,12 @@ WA.onInit().then(() => {
         if (busy) return;
         busy = true;
         try {
+            // The meeting end is known locally: leave on time even if the service is slow or down.
+            if (active && Date.now() >= active.endsAt) await leave();
             const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid };
-            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
-                .catch(() => null);
-            if (!res || !res.ok) {
-                // Service unreachable: still end a meeting on time, but never start or move one.
-                if (active && Date.now() >= active.endsAt) await leave();
-                return;
-            }
+            const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+                signal: AbortSignal.timeout(10000) }).catch(() => null);
+            if (!res || !res.ok) return;   // service unreachable: never start or move a meeting
             const meeting = (await res.json()).meeting;
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
                 const back = active ? active.back : await WA.player.getPosition();
