@@ -542,8 +542,10 @@ WA.onInit().then(() => {
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
                 const back = active ? active.back : await WA.player.getPosition();
                 active = { key: meeting.key, x: meeting.x, y: meeting.y, endsAt: meeting.endsAt, back };
-                status("dnd");
+                // WorkAdventure switches the status back to online whenever the player moves, so set
+                // "Do not disturb" only after arriving (and again after every later move, see below).
                 await go(meeting.x, meeting.y);
+                if (active) status("dnd");
             } else if (!meeting && active) {
                 await leave();
             }
@@ -553,6 +555,12 @@ WA.onInit().then(() => {
             busy = false;
         }
     }
+    // Moving resets the status to online. During a meeting, put "Do not disturb" back once the player stops.
+    let settle;
+    WA.player.onPlayerMove((ev) => {
+        clearTimeout(settle);
+        if (active && !ev.moving) settle = setTimeout(() => { if (active) status("dnd"); }, 500);
+    });
     setTimeout(tick, 4000);          // after the desk spawn has placed the player
     setInterval(tick, 30000);
 });
