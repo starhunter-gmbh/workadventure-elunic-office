@@ -584,32 +584,19 @@ WA.onInit().then(() => {
     setInterval(tick, 30000);
 });
 
-// --- chairs: stop close to a chair and the player sits down on it, exactly centred ---
+// --- chairs: stop close to a chair and the player sits down on it, exactly centred, immediately ---
 WA.onInit().then(() => {
-    const SNAP_PX = 24;            // less than a tile: walking past a chair does not pull the player onto it
-    let timer;
-    let snapping = false;
+    const SNAP_PX = 30;            // about one tile: walking past a chair does not pull the player onto it
     WA.player.onPlayerMove((ev) => {
-        clearTimeout(timer);
-        if (ev.moving || snapping) return;
-        timer = setTimeout(async () => {
-            const pos = await WA.player.getPosition();
-            let best = null, bestDist = Infinity;
-            for (const c of CHAIRS) {
-                const d = Math.hypot(c[0] - pos.x, c[1] - pos.y);
-                if (d < bestDist) { best = c; bestDist = d; }
-            }
-            if (!best || bestDist < 1 || bestDist > SNAP_PX) return;
-            snapping = true;
-            try {
-                const r = await WA.player.moveTo(best[0], best[1]);
-                if (r && r.cancelled) return;   // the player walked on: no correction
-            } catch (e) {
-                await WA.player.teleport(best[0], best[1]).catch(() => {});
-            } finally {
-                snapping = false;
-            }
-        }, 300);
+        if (ev.moving) return;
+        let best = null, bestDist = Infinity;
+        for (const c of CHAIRS) {
+            const d = Math.hypot(c[0] - ev.x, c[1] - ev.y);
+            if (d < bestDist) { best = c; bestDist = d; }
+        }
+        // Teleport instead of moveTo: no path around tables, no delay. The teleport itself ends with a "stopped"
+        // event right on the chair (distance 0), which ends the loop.
+        if (best && bestDist >= 1 && bestDist <= SNAP_PX) WA.player.teleport(best[0], best[1]).catch(() => {});
     });
 });
 
