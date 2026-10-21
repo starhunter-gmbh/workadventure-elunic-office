@@ -520,6 +520,16 @@ let seatBridge = false;
 window.addEventListener("message", (e) => { if (e.data && e.data.type === "elunic-seat-bridge") seatBridge = true; });
 window.parent.postMessage({ type: "elunic-seat-hello" }, "*");
 // facing of the chair at (x, y), if there is one (calendar seats are tile centres, wide chairs are centred on two tiles)
+// True while the calendar moves the player: the chair snap stays out of the way (its walk would reset the status).
+let scriptedMove = false;
+const nearestChair = (x, y, maxPx) => {
+    let best = null, bestDist = Infinity;
+    for (const c of CHAIRS) {
+        const d = Math.hypot(c[0] - x, c[1] - y);
+        if (d < bestDist) { best = c; bestDist = d; }
+    }
+    return best && bestDist <= maxPx ? best : null;
+};
 const facingAt = (x, y) => (CHAIRS.find((c) => Math.hypot(c[0] - x, c[1] - y) <= 20) || [])[2];
 
 // Resolves once the desk spawn is done, so the calendar check on entry starts right after it.
@@ -579,7 +589,19 @@ WA.onInit().then(() => {
         finished.add(active.key + "|" + active.endsAt);
         const back = active.back;
         active = null;
-        await go(back.x, back.y);
+        scriptedMove = true;
+        try {
+            await go(back.x, back.y);
+            // Sit down on the desk chair here, without a further walk: teleport does not reset the status, a walk
+            // would turn the restored status back into online.
+            const chair = nearestChair(back.x, back.y, 30);
+            if (chair) {
+                await WA.player.teleport(chair[0], chair[1]).catch(() => {});
+                if (chair[2]) face(chair[2]);
+            }
+        } finally {
+            scriptedMove = false;
+        }
         status("restore");
     }
     let first = true;   // the first check right after entering the map
@@ -606,8 +628,13 @@ WA.onInit().then(() => {
                 // "dnd" before the walk lets the bridge save the status from before the meeting; WorkAdventure resets
                 // the status to online on every move, so "dnd" again after arriving (and after every later move).
                 status("dnd");
-                if (first) await WA.player.teleport(meeting.x, meeting.y).catch(() => go(meeting.x, meeting.y));   // entering mid-meeting: straight into the room
-                else await go(meeting.x, meeting.y);
+                scriptedMove = true;
+                try {
+                    if (first) await WA.player.teleport(meeting.x, meeting.y).catch(() => go(meeting.x, meeting.y));   // entering mid-meeting: straight into the room
+                    else await go(meeting.x, meeting.y);
+                } finally {
+                    scriptedMove = false;
+                }
                 const dir = facingAt(meeting.x, meeting.y);
                 if (active && dir) face(dir);
                 if (active) status("dnd");
@@ -646,7 +673,7 @@ WA.onInit().then(async () => {
         return false;
     };
     WA.player.onPlayerMove((ev) => {
-        if (ev.moving) return;
+        if (ev.moving || scriptedMove) return;   // the calendar walk/teleport places the player itself
         let best = null, bestDist = Infinity;
         for (const c of CHAIRS) {
             const d = Math.hypot(c[0] - ev.x, c[1] - ev.y);
