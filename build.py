@@ -572,10 +572,11 @@ WA.onInit().then(() => {
         }
     };
     let active = null;   // { key, x, y, endsAt, back: {x, y} }
-    const finished = new Set();   // meeting keys this page already left: a late response never restarts them
+    const finished = new Set();   // "key|end" of meetings this page already left: a late answer never restarts them,
+                                  // but an extended meeting (same key, later end) does
     let busy = false;
     async function leave() {
-        finished.add(active.key);
+        finished.add(active.key + "|" + active.endsAt);
         const back = active.back;
         active = null;
         await go(back.x, back.y);
@@ -597,7 +598,8 @@ WA.onInit().then(() => {
             // The answer may be late: drop it if the meeting has ended meanwhile, was already left here, or the
             // player identity changed while it was on its way.
             if (who !== WA.player.uuid + "|" + WA.player.name) return;
-            if (meeting && (meeting.endsAt <= Date.now() || finished.has(meeting.key))) meeting = null;
+            if (meeting && (meeting.endsAt <= Date.now() || finished.has(meeting.key + "|" + meeting.endsAt))) meeting = null;
+            if (meeting && active && active.key === meeting.key) active.endsAt = meeting.endsAt;   // extended or shortened
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
                 const back = active ? active.back : await WA.player.getPosition();
                 active = { key: meeting.key, x: meeting.x, y: meeting.y, endsAt: meeting.endsAt, back };
