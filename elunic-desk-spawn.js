@@ -3,6 +3,8 @@
 // every seat on the map as [x, y, facing]. facing ("up" | "down" | "left" | "right") points towards the table.
 const SPAWNS = {"164bd138-3fe6-548b-ae2f-dce146312927": [368, 720, "right"], "8afde150-a0b5-581c-9f8d-71ae945bdd60": [464, 720, "left"], "f6a23e1c-63c8-5e08-806e-34169802d65d": [368, 784, "right"], "a6e2505a-3185-50ef-806c-4391737e07a5": [464, 784, "left"], "97e1dc15-4fea-56ce-9bb7-38d58edd076d": [368, 848, "right"], "dff13515-edf1-5f35-acda-5eaeb17fb4a4": [464, 848, "left"], "9ae7dfe4-700b-582c-a57e-ef1514fea03c": [368, 912, "right"], "e18f0dfb-77e5-5161-a78f-bb9edc0433f1": [464, 912, "left"], "14643efe-0f6b-58f7-a1ff-0f2afb6ff19f": [560, 720, "right"], "113a32cc-9edd-5107-9608-4a1251554679": [656, 720, "left"], "2a8e23dc-9cc8-5005-9c47-79cd481ed3cd": [560, 784, "right"], "aa580281-5771-547c-b483-ac2fa80e4b26": [656, 784, "left"], "af7f58eb-1afc-5c0b-9cc3-452677088205": [560, 848, "right"], "450609fd-01f2-5f22-b656-d8401ca4265f": [656, 848, "left"], "ec12f490-0bf0-51d7-9b9b-6f525391467c": [560, 912, "right"], "30d0ee37-e03d-56b3-b5e3-eba03154fc6b": [656, 912, "left"], "8bac6a11-b343-575d-9ddd-d2ad69a05944": [720, 848, "right"], "f873e501-d531-5ea1-aaa8-15f95b9cb8f2": [816, 848, "left"], "36be4b67-839a-5592-a2fa-fb1473056b0f": [720, 912, "right"], "5aed9896-d965-58a6-b6f0-5e713eb71172": [816, 912, "left"], "c1c618b6-d554-554b-af4e-5cc87627ddff": [848, 848, "right"], "4a53bfed-19d0-5f64-a129-392755103084": [944, 848, "left"], "d9736064-eb4c-5cf7-8955-1ced3bd2dde8": [848, 912, "right"], "e3f18364-0da5-5aea-9666-ea8302dedecb": [944, 912, "left"], "6d4185cd-944f-58ea-995c-51236f3037be": [976, 848, "right"], "ccf8fb6e-d16c-55ac-a20d-2fe5dfc82fb7": [1072, 848, "left"], "463b9adc-a175-5799-b095-186566bb1d3d": [976, 912, "right"], "649a4fd3-32b4-5674-9b5b-075c0a0df1e9": [1072, 912, "left"], "18435dd2-b186-5498-ae36-c0a9afc6fe2b": [144, 496, "right"], "9fa9771b-ee14-5a34-85c0-9812f2dc6cc7": [304, 496, "right"], "47109bd6-0719-5755-838e-855906933cc6": [1328, 816, "down"], "ec9f0b1b-b5cf-5290-b3b5-453f87942534": [1392, 816, "down"], "b4897a0a-6a05-57ac-a712-01ca804047a5": [1328, 944, "up"], "b52de8cf-c827-59ac-8c42-c71ca087adb9": [1392, 944, "up"], "9d3b784f-3058-5868-a197-8fc2ea288a48": [1584, 944, "left"]};
 const CHAIRS = [[560, 80, "down"], [592, 80, "down"], [624, 80, "down"], [656, 80, "down"], [688, 80, "down"], [496, 112, "right"], [560, 144, "up"], [592, 144, "up"], [624, 144, "up"], [656, 144, "up"], [688, 144, "up"], [560, 240, "down"], [592, 240, "down"], [624, 272, "down"], [528, 304, "down"], [1488, 304, "down"], [1520, 304, "down"], [1552, 304, "down"], [1584, 304, "down"], [240, 336, "down"], [400, 336, "down"], [1232, 336, "down"], [1392, 336, "down"], [240, 368, "down"], [400, 368, "down"], [592, 400, "right"], [688, 400, "right"], [1264, 400, "up"], [1296, 400, "up"], [1328, 400, "up"], [1360, 400, "up"], [1488, 400, "up"], [1520, 400, "up"], [1552, 400, "up"], [1584, 400, "up"], [464, 464, "down"], [528, 464, "down"], [592, 464, "down"], [1520, 464, "down"], [1552, 464, "down"], [1584, 464, "down"], [144, 496, "right"], [304, 496, "right"], [1264, 528, "left"], [1648, 528, "left"], [464, 560, "up"], [528, 560, "up"], [592, 560, "up"], [1520, 560, "up"], [1552, 560, "up"], [1584, 560, "up"], [368, 720, "right"], [464, 720, "left"], [560, 720, "right"], [656, 720, "left"], [368, 784, "right"], [464, 784, "left"], [560, 784, "right"], [656, 784, "left"], [176, 816, "down"], [208, 816, "down"], [1584, 816, "right"], [368, 848, "right"], [464, 848, "left"], [560, 848, "right"], [656, 848, "left"], [720, 848, "right"], [816, 848, "left"], [848, 848, "right"], [944, 848, "left"], [976, 848, "right"], [1072, 848, "left"], [1200, 848, "right"], [1344, 848, "down"], [1408, 848, "down"], [1616, 880, "up"], [368, 912, "right"], [464, 912, "left"], [560, 912, "right"], [656, 912, "left"], [720, 912, "right"], [816, 912, "left"], [848, 912, "right"], [944, 912, "left"], [976, 912, "right"], [1072, 912, "left"], [176, 944, "up"], [208, 944, "up"], [1344, 944, "up"], [1408, 944, "up"], [1584, 944, "left"]];
+// Conference rooms of the calendar service (same ids as elunic-rooms.json): interior [x, y, width, height] in pixels.
+const ROOM_RECTS = {"conference-big": [480, 32, 288, 160], "conference-small": [416, 448, 224, 128], "balcony-right-table": [1440, 288, 224, 128], "balcony-right-lounge": [1184, 288, 256, 128], "balcony-left": [32, 288, 416, 128], "office-bottom-right": [1536, 704, 128, 288], "office-a": [64, 448, 160, 128], "office-b": [256, 448, 128, 128]};
 
 // The play frontend (elunic seat bridge) walks the player straight onto a chair and turns it; the scripting API can
 // neither walk inside a tile nor set the facing direction. Only this script's iframe is trusted by the bridge.
@@ -78,9 +80,12 @@ WA.onInit().then(() => {
     const finished = new Set();   // "key|end" of meetings this page already left: a late answer never restarts them,
                                   // but an extended meeting (same key, later end) does
     let busy = false;
+    let mine = null;      // own meeting from the last answer (also after "leave meeting", for a rejoin)
+    let lastBack = null;  // desk position of the current meeting, kept for a rejoin
     async function leave() {
         finished.add(active.key + "|" + active.endsAt);
         const back = active.back;
+        lastBack = back;
         active = null;
         scriptedMove = true;
         try {
@@ -98,25 +103,36 @@ WA.onInit().then(() => {
         status("restore");
     }
     let first = true;   // the first check right after entering the map
-    async function tick() {
+    // action: undefined (regular ping), "leave" (button), "rejoin" (walked back into the own meeting room)
+    async function tick(action) {
+        while (busy && action) await new Promise((r) => setTimeout(r, 200));
         if (busy) return;
         busy = true;
         try {
             // The meeting end is known locally: leave on time even if the service is slow or down.
             if (active && Date.now() >= active.endsAt) await leave();
             const who = WA.player.uuid + "|" + WA.player.name;
-            const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid };
+            const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid, action };
+            if (action === "rejoin" && mine) finished.delete(mine.key + "|" + mine.endsAt);
             const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
                 signal: AbortSignal.timeout(10000) }).catch(() => null);
             if (!res || !res.ok) return;   // service unreachable: never start or move a meeting
-            let meeting = (await res.json()).meeting;
+            const data = await res.json();
+            let meeting = data.meeting;
+            await updateLabels(Array.isArray(data.rooms) ? data.rooms : []);
             // The answer may be late: drop it if the meeting has ended meanwhile, was already left here, or the
             // player identity changed while it was on its way.
             if (who !== WA.player.uuid + "|" + WA.player.name) return;
             if (meeting && (meeting.endsAt <= Date.now() || finished.has(meeting.key + "|" + meeting.endsAt))) meeting = null;
+            mine = meeting;
+            if (meeting && meeting.left) {
+                // Left with the button (here or in another tab): back to the desk, keep the room for a rejoin.
+                if (active && active.key === meeting.key) await leave();
+                meeting = null;
+            }
             if (meeting && active && active.key === meeting.key) active.endsAt = meeting.endsAt;   // extended or shortened
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
-                const back = active ? active.back : await WA.player.getPosition();
+                const back = active ? active.back : (action === "rejoin" && lastBack) || await WA.player.getPosition();
                 active = { key: meeting.key, x: meeting.x, y: meeting.y, endsAt: meeting.endsAt, back };
                 // "dnd" before the walk lets the bridge save the status from before the meeting; WorkAdventure resets
                 // the status to online on every move, so "dnd" again after arriving (and after every later move).
@@ -139,7 +155,81 @@ WA.onInit().then(() => {
         } finally {
             busy = false;
             first = false;
+            refreshChip();
         }
+    }
+
+    // --- meeting rooms: a label with the meeting title in every room with a running meeting; inside the own meeting
+    // room a chip (like the one of a personal desk area) and a button to leave the meeting and go back to the desk.
+    const de = (navigator.language || "").toLowerCase().startsWith("de");
+    const T = de
+        ? { meeting: "Termin", private: "Privater Termin", room: "Terminraum", leave: "Termin verlassen und zum Platz zurück" }
+        : { meeting: "Meeting", private: "Private meeting", room: "Meeting room", leave: "Leave meeting and go back to my desk" };
+    const labelText = (r) => r.title || (r.isPrivate ? T.private : T.meeting);
+    const pageUrl = (page, text, button) => new URL(page + "?t=" + encodeURIComponent(text) + (button ? "&b=" + encodeURIComponent(button) : ""),
+        WA.room.mapURL).toString();
+    // Embedded websites get a white background from WorkAdventure: size the label frame to its text.
+    const labelBox = (rect, text) => {
+        const width = Math.min(rect[2] - 8, Math.round(34 + text.length * 7));
+        return { x: rect[0] + Math.round((rect[2] - width) / 2), y: rect[1] - 27, width, height: 22 };   // on the wall above the room
+    };
+    const labels = new Map();   // roomId -> { text, site }
+    async function updateLabels(rooms) {
+        const seen = new Set();
+        for (const r of rooms) {
+            const rect = ROOM_RECTS[r.roomId];
+            if (!rect || seen.has(r.roomId)) continue;
+            seen.add(r.roomId);
+            const text = labelText(r);
+            const cur = labels.get(r.roomId);
+            if (cur && cur.text === text) continue;
+            if (cur) {
+                labels.delete(r.roomId);
+                await WA.room.website.delete("elunic-label-" + r.roomId).catch(() => {});
+            }
+            const site = WA.room.website.create({ name: "elunic-label-" + r.roomId, url: pageUrl("meeting-label.html", text),
+                position: labelBox(rect, text), visible: true, allowApi: false, origin: "map", scale: 1 });
+            labels.set(r.roomId, { text, site });
+        }
+        for (const id of [...labels.keys()]) {
+            if (seen.has(id)) continue;
+            labels.delete(id);
+            WA.room.website.delete("elunic-label-" + id).catch(() => {});
+        }
+    }
+    let currentRoom = null;
+    let chip = null, chipText = "", chipBusy = Promise.resolve();
+    function refreshChip() {
+        chipBusy = chipBusy.then(async () => {
+            const show = currentRoom && active && mine && !mine.left && mine.roomId === currentRoom;
+            const text = show ? T.room + ": " + labelText(mine) : "";
+            if (text === chipText) return;
+            chipText = text;
+            if (chip) {
+                const old = chip;
+                chip = null;
+                await old.close().catch(() => {});
+            }
+            if (!show) return;
+            // The chip carries the "leave meeting" button (action bar buttons from scripts end up in a collapsed menu).
+            chip = await WA.ui.website.open({ url: pageUrl("meeting-chip.html", text, T.leave), visible: true, allowApi: true,
+                position: { vertical: "top", horizontal: "right" }, size: { width: "340px", height: "82px" }, margin: { top: "84px", right: "16px" } });
+        }).catch((e) => console.warn("elunic meeting chip", e));
+    }
+    WA.player.state.onVariableChange("elunicMeetingLeave").subscribe(() => tick("leave"));
+    for (const [id, rect] of Object.entries(ROOM_RECTS)) {
+        const name = "elunic-room-" + id;
+        WA.room.area.create({ name, x: rect[0], y: rect[1], width: rect[2], height: rect[3] });
+        WA.room.area.onEnter(name).subscribe(() => {
+            currentRoom = id;
+            // Walking back into the own meeting after "leave meeting" joins it again (Do not disturb, seat).
+            if (mine && mine.left && mine.roomId === id && !scriptedMove) tick("rejoin");
+            refreshChip();
+        });
+        WA.room.area.onLeave(name).subscribe(() => {
+            if (currentRoom === id) currentRoom = null;
+            refreshChip();
+        });
     }
     // Moving resets the status to online. During a meeting, put "Do not disturb" back once the player stops.
     let settle;

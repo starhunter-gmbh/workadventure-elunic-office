@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meeting room</title>
+<!-- Chip of the elunic office map while the player is inside the own meeting room (like a personal desk area), with
+     the button to leave the meeting. The button sets the player variable "elunicMeetingLeave"; the map script listens. -->
+<script src="/iframe_api.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1b2a41; }
+  body { box-sizing: border-box; padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; gap: 8px;
+         font: 500 13px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff; }
+  .row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #f05454; }
+  #t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  button { font: inherit; font-weight: 600; color: #1b2a41; background: #fff; border: 0; border-radius: 8px; padding: 7px 10px; cursor: pointer; }
+  button:hover { background: #e8edf5; }
+  button:disabled { opacity: 0.6; cursor: default; }
+</style>
+</head>
+<body>
+<div class="row"><div class="dot"></div><div id="t"></div></div>
+<button id="leave" type="button"></button>
+<script>
+  const q = new URLSearchParams(location.search);
+  document.getElementById("t").textContent = q.get("t") || "";
+  const button = document.getElementById("leave");
+  button.textContent = q.get("b") || "Termin verlassen und zum Platz zurück";
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    await WA.onInit();
+    WA.player.state.saveVariable("elunicMeetingLeave", Date.now(), { public: false, persist: false });
+  });
+</script>
+</body>
+</html>

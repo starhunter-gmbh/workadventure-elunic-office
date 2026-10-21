@@ -510,6 +510,8 @@ open(f'{KIT}/elunic-desk-spawn.js', 'w').write("""// elunic: on room entry, put 
 // every seat on the map as [x, y, facing]. facing ("up" | "down" | "left" | "right") points towards the table.
 const SPAWNS = """ + json.dumps(spawns) + """;
 const CHAIRS = """ + json.dumps(chairs) + """;
+// Conference rooms of the calendar service (same ids as elunic-rooms.json): interior [x, y, width, height] in pixels.
+const ROOM_RECTS = """ + json.dumps({rid: [x0 * 32, y0 * 32, (x1 - x0 + 1) * 32, (y1 - y0 + 1) * 32] for rid, _l, (x0, y0, x1, y1) in CONF_ROOMS}) + """;
 
 // The play frontend (elunic seat bridge) walks the player straight onto a chair and turns it; the scripting API can
 // neither walk inside a tile nor set the facing direction. Only this script's iframe is trusted by the bridge.
@@ -585,9 +587,12 @@ WA.onInit().then(() => {
     const finished = new Set();   // "key|end" of meetings this page already left: a late answer never restarts them,
                                   // but an extended meeting (same key, later end) does
     let busy = false;
+    let mine = null;      // own meeting from the last answer (also after "leave meeting", for a rejoin)
+    let lastBack = null;  // desk position of the current meeting, kept for a rejoin
     async function leave() {
         finished.add(active.key + "|" + active.endsAt);
         const back = active.back;
+        lastBack = back;
         active = null;
         scriptedMove = true;
         try {
@@ -605,25 +610,36 @@ WA.onInit().then(() => {
         status("restore");
     }
     let first = true;   // the first check right after entering the map
-    async function tick() {
+    // action: undefined (regular ping), "leave" (button), "rejoin" (walked back into the own meeting room)
+    async function tick(action) {
+        while (busy && action) await new Promise((r) => setTimeout(r, 200));
         if (busy) return;
         busy = true;
         try {
             // The meeting end is known locally: leave on time even if the service is slow or down.
             if (active && Date.now() >= active.endsAt) await leave();
             const who = WA.player.uuid + "|" + WA.player.name;
-            const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid };
+            const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid, action };
+            if (action === "rejoin" && mine) finished.delete(mine.key + "|" + mine.endsAt);
             const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
                 signal: AbortSignal.timeout(10000) }).catch(() => null);
             if (!res || !res.ok) return;   // service unreachable: never start or move a meeting
-            let meeting = (await res.json()).meeting;
+            const data = await res.json();
+            let meeting = data.meeting;
+            await updateLabels(Array.isArray(data.rooms) ? data.rooms : []);
             // The answer may be late: drop it if the meeting has ended meanwhile, was already left here, or the
             // player identity changed while it was on its way.
             if (who !== WA.player.uuid + "|" + WA.player.name) return;
             if (meeting && (meeting.endsAt <= Date.now() || finished.has(meeting.key + "|" + meeting.endsAt))) meeting = null;
+            mine = meeting;
+            if (meeting && meeting.left) {
+                // Left with the button (here or in another tab): back to the desk, keep the room for a rejoin.
+                if (active && active.key === meeting.key) await leave();
+                meeting = null;
+            }
             if (meeting && active && active.key === meeting.key) active.endsAt = meeting.endsAt;   // extended or shortened
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
-                const back = active ? active.back : await WA.player.getPosition();
+                const back = active ? active.back : (action === "rejoin" && lastBack) || await WA.player.getPosition();
                 active = { key: meeting.key, x: meeting.x, y: meeting.y, endsAt: meeting.endsAt, back };
                 // "dnd" before the walk lets the bridge save the status from before the meeting; WorkAdventure resets
                 // the status to online on every move, so "dnd" again after arriving (and after every later move).
@@ -646,7 +662,81 @@ WA.onInit().then(() => {
         } finally {
             busy = false;
             first = false;
+            refreshChip();
         }
+    }
+
+    // --- meeting rooms: a label with the meeting title in every room with a running meeting; inside the own meeting
+    // room a chip (like the one of a personal desk area) and a button to leave the meeting and go back to the desk.
+    const de = (navigator.language || "").toLowerCase().startsWith("de");
+    const T = de
+        ? { meeting: "Termin", private: "Privater Termin", room: "Terminraum", leave: "Termin verlassen und zum Platz zurück" }
+        : { meeting: "Meeting", private: "Private meeting", room: "Meeting room", leave: "Leave meeting and go back to my desk" };
+    const labelText = (r) => r.title || (r.isPrivate ? T.private : T.meeting);
+    const pageUrl = (page, text, button) => new URL(page + "?t=" + encodeURIComponent(text) + (button ? "&b=" + encodeURIComponent(button) : ""),
+        WA.room.mapURL).toString();
+    // Embedded websites get a white background from WorkAdventure: size the label frame to its text.
+    const labelBox = (rect, text) => {
+        const width = Math.min(rect[2] - 8, Math.round(34 + text.length * 7));
+        return { x: rect[0] + Math.round((rect[2] - width) / 2), y: rect[1] - 27, width, height: 22 };   // on the wall above the room
+    };
+    const labels = new Map();   // roomId -> { text, site }
+    async function updateLabels(rooms) {
+        const seen = new Set();
+        for (const r of rooms) {
+            const rect = ROOM_RECTS[r.roomId];
+            if (!rect || seen.has(r.roomId)) continue;
+            seen.add(r.roomId);
+            const text = labelText(r);
+            const cur = labels.get(r.roomId);
+            if (cur && cur.text === text) continue;
+            if (cur) {
+                labels.delete(r.roomId);
+                await WA.room.website.delete("elunic-label-" + r.roomId).catch(() => {});
+            }
+            const site = WA.room.website.create({ name: "elunic-label-" + r.roomId, url: pageUrl("meeting-label.html", text),
+                position: labelBox(rect, text), visible: true, allowApi: false, origin: "map", scale: 1 });
+            labels.set(r.roomId, { text, site });
+        }
+        for (const id of [...labels.keys()]) {
+            if (seen.has(id)) continue;
+            labels.delete(id);
+            WA.room.website.delete("elunic-label-" + id).catch(() => {});
+        }
+    }
+    let currentRoom = null;
+    let chip = null, chipText = "", chipBusy = Promise.resolve();
+    function refreshChip() {
+        chipBusy = chipBusy.then(async () => {
+            const show = currentRoom && active && mine && !mine.left && mine.roomId === currentRoom;
+            const text = show ? T.room + ": " + labelText(mine) : "";
+            if (text === chipText) return;
+            chipText = text;
+            if (chip) {
+                const old = chip;
+                chip = null;
+                await old.close().catch(() => {});
+            }
+            if (!show) return;
+            // The chip carries the "leave meeting" button (action bar buttons from scripts end up in a collapsed menu).
+            chip = await WA.ui.website.open({ url: pageUrl("meeting-chip.html", text, T.leave), visible: true, allowApi: true,
+                position: { vertical: "top", horizontal: "right" }, size: { width: "340px", height: "82px" }, margin: { top: "84px", right: "16px" } });
+        }).catch((e) => console.warn("elunic meeting chip", e));
+    }
+    WA.player.state.onVariableChange("elunicMeetingLeave").subscribe(() => tick("leave"));
+    for (const [id, rect] of Object.entries(ROOM_RECTS)) {
+        const name = "elunic-room-" + id;
+        WA.room.area.create({ name, x: rect[0], y: rect[1], width: rect[2], height: rect[3] });
+        WA.room.area.onEnter(name).subscribe(() => {
+            currentRoom = id;
+            // Walking back into the own meeting after "leave meeting" joins it again (Do not disturb, seat).
+            if (mine && mine.left && mine.roomId === id && !scriptedMove) tick("rejoin");
+            refreshChip();
+        });
+        WA.room.area.onLeave(name).subscribe(() => {
+            if (currentRoom === id) currentRoom = null;
+            refreshChip();
+        });
     }
     // Moving resets the status to online. During a meeting, put "Do not disturb" back once the player stops.
     let settle;

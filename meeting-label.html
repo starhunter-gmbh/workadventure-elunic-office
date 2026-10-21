@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meeting label</title>
+<!-- Room label of the elunic office map: the running meeting's title (?t=). WorkAdventure puts embedded websites on a
+     white background, so the page fills the whole (text-sized) frame with the label colour. -->
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1b2a41; }
+  body { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; box-sizing: border-box;
+         font: 600 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff; }
+  .dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #f05454; }
+  #t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body><div class="dot"></div><div id="t"></div>
+<script>document.getElementById("t").textContent = new URLSearchParams(location.search).get("t") || "";</script>
+</body>
+</html>
