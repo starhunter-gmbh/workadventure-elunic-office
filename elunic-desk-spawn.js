@@ -64,8 +64,10 @@ WA.onInit().then(() => {
         }
     };
     let active = null;   // { key, x, y, endsAt, back: {x, y} }
+    const finished = new Set();   // meeting keys this page already left: a late response never restarts them
     let busy = false;
     async function leave() {
+        finished.add(active.key);
         const back = active.back;
         active = null;
         await go(back.x, back.y);
@@ -77,16 +79,22 @@ WA.onInit().then(() => {
         try {
             // The meeting end is known locally: leave on time even if the service is slow or down.
             if (active && Date.now() >= active.endsAt) await leave();
+            const who = WA.player.uuid + "|" + WA.player.name;
             const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid };
             const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
                 signal: AbortSignal.timeout(10000) }).catch(() => null);
             if (!res || !res.ok) return;   // service unreachable: never start or move a meeting
-            const meeting = (await res.json()).meeting;
+            let meeting = (await res.json()).meeting;
+            // The answer may be late: drop it if the meeting has ended meanwhile, was already left here, or the
+            // player identity changed while it was on its way.
+            if (who !== WA.player.uuid + "|" + WA.player.name) return;
+            if (meeting && (meeting.endsAt <= Date.now() || finished.has(meeting.key))) meeting = null;
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
                 const back = active ? active.back : await WA.player.getPosition();
                 active = { key: meeting.key, x: meeting.x, y: meeting.y, endsAt: meeting.endsAt, back };
-                // WorkAdventure switches the status back to online whenever the player moves, so set
-                // "Do not disturb" only after arriving (and again after every later move, see below).
+                // "dnd" before the walk lets the bridge save the status from before the meeting; WorkAdventure resets
+                // the status to online on every move, so "dnd" again after arriving (and after every later move).
+                status("dnd");
                 await go(meeting.x, meeting.y);
                 const dir = facingAt(meeting.x, meeting.y);
                 if (active && dir) face(dir);
