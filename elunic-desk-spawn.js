@@ -123,12 +123,16 @@ WA.onInit().then(() => {
             // The answer may be late: drop it if the meeting has ended meanwhile, was already left here, or the
             // player identity changed while it was on its way.
             if (who !== WA.player.uuid + "|" + WA.player.name) return;
-            if (meeting && (meeting.endsAt <= Date.now() || finished.has(meeting.key + "|" + meeting.endsAt))) meeting = null;
-            mine = meeting;
+            if (meeting && meeting.endsAt <= Date.now()) meeting = null;
             if (meeting && meeting.left) {
                 // Left with the button (here or in another tab): back to the desk, keep the room for a rejoin.
+                // Not subject to the left-meeting guard below, otherwise the rejoin context would get lost.
+                mine = meeting;
                 if (active && active.key === meeting.key) await leave();
                 meeting = null;
+            } else {
+                if (meeting && finished.has(meeting.key + "|" + meeting.endsAt)) meeting = null;
+                mine = meeting;
             }
             if (meeting && active && active.key === meeting.key) active.endsAt = meeting.endsAt;   // extended or shortened
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
