@@ -15,7 +15,8 @@ window.parent.postMessage({ type: "elunic-seat-hello" }, "*");
 // facing of the chair at (x, y), if there is one (calendar seats are tile centres, wide chairs are centred on two tiles)
 const facingAt = (x, y) => (CHAIRS.find((c) => Math.hypot(c[0] - x, c[1] - y) <= 20) || [])[2];
 
-WA.onInit().then(async () => {
+// Resolves once the desk spawn is done, so the calendar check on entry starts right after it.
+const deskSpawnDone = WA.onInit().then(async () => {
     const dbg = [];
     try {
         // An explicit position in the link (e.g. #start-area) wins.
@@ -73,6 +74,7 @@ WA.onInit().then(() => {
         await go(back.x, back.y);
         status("restore");
     }
+    let first = true;   // the first check right after entering the map
     async function tick() {
         if (busy) return;
         busy = true;
@@ -95,7 +97,8 @@ WA.onInit().then(() => {
                 // "dnd" before the walk lets the bridge save the status from before the meeting; WorkAdventure resets
                 // the status to online on every move, so "dnd" again after arriving (and after every later move).
                 status("dnd");
-                await go(meeting.x, meeting.y);
+                if (first) await WA.player.teleport(meeting.x, meeting.y).catch(() => go(meeting.x, meeting.y));   // entering mid-meeting: straight into the room
+                else await go(meeting.x, meeting.y);
                 const dir = facingAt(meeting.x, meeting.y);
                 if (active && dir) face(dir);
                 if (active) status("dnd");
@@ -106,6 +109,7 @@ WA.onInit().then(() => {
             console.warn("elunic calendar", e);
         } finally {
             busy = false;
+            first = false;
         }
     }
     // Moving resets the status to online. During a meeting, put "Do not disturb" back once the player stops.
@@ -114,7 +118,7 @@ WA.onInit().then(() => {
         clearTimeout(settle);
         if (active && !ev.moving) settle = setTimeout(() => { if (active) status("dnd"); }, 500);
     });
-    setTimeout(tick, 4000);          // after the desk spawn has placed the player
+    deskSpawnDone.catch(() => {}).then(tick);   // right after the desk spawn has placed the player
     setInterval(tick, 30000);
 });
 
