@@ -1,0 +1,597 @@
+{
+ "version": "1.0.0",
+ "mapUrl": "newoffice.tmj",
+ "entities": {},
+ "areas": [
+  {
+   "id": "cfce74cb-2d01-5f26-b56a-aa89ad4c3852",
+   "x": 188,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 1",
+   "properties": [
+    {
+     "id": "6c481a33-838b-56ad-a731-0e67d4a0b116",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "98b2ba06-bad4-5da9-b3dc-62f14689c0f4",
+   "x": 188,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 2",
+   "properties": [
+    {
+     "id": "0bbc676e-9db1-58bc-b177-0c8077113548",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "bc909578-d7ec-5fbe-b1df-9e657830a71e",
+   "x": 188,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 3",
+   "properties": [
+    {
+     "id": "de0bcd3e-9c32-58d6-a130-b2cc9da4a367",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "3f0001ce-8cc9-55dd-935b-f52baf13a566",
+   "x": 274,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 4",
+   "properties": [
+    {
+     "id": "e88d2a90-4fc8-5af5-aa18-5e1131f7255d",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "0a395e3c-722f-5821-bec1-7151e2fca26a",
+   "x": 274,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 5",
+   "properties": [
+    {
+     "id": "f17024b5-a5b6-5955-bb3f-5cf6f74bcaf1",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "7164bfb0-de9c-5f92-bc67-22e101863b3f",
+   "x": 274,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 6",
+   "properties": [
+    {
+     "id": "5b8ff4dc-39af-55bb-b5e6-dcc6902efe4e",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "347cde93-9505-5d5b-9907-ba2a0d06fccc",
+   "x": 348,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 7",
+   "properties": [
+    {
+     "id": "89b01161-cee6-528d-be44-19771a1eb503",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "8305f062-c540-5c69-8846-5bcf77920a8a",
+   "x": 348,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 8",
+   "properties": [
+    {
+     "id": "ef4ef939-0726-57eb-9588-e9c7917fedf6",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "7d2c0095-a765-5db1-aefd-186e3eb0283f",
+   "x": 348,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 9",
+   "properties": [
+    {
+     "id": "010e3fb9-7432-5845-882e-b16f67e939dc",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "f34d70ff-1a1d-5e59-b12b-de9d69f1cda0",
+   "x": 434,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 10",
+   "properties": [
+    {
+     "id": "d67b7eab-322f-576b-b03d-21a54e2c0f25",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "c2f07d89-0c35-5bdd-9bcd-9c187e044cf8",
+   "x": 434,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 11",
+   "properties": [
+    {
+     "id": "2ade8bba-1e99-5019-8827-aa6b1dd38b90",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "b2e5a0f7-4524-50b0-a0ce-f67f400ecfdd",
+   "x": 434,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 12",
+   "properties": [
+    {
+     "id": "e4316eb7-a18f-57f7-9398-b217856a9a6a",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "ee1e9c39-3276-5598-ad18-441986fdf1f3",
+   "x": 509,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 13",
+   "properties": [
+    {
+     "id": "46474f6e-7199-5ddd-b481-e0d4779734ce",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "f259fb2c-d2cb-5934-bd1c-6b9c96013a44",
+   "x": 509,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 14",
+   "properties": [
+    {
+     "id": "e9ab4e82-79cb-53e9-b780-09220d671b2a",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "5e38c196-60d0-58b5-9541-0edbdc0d58f3",
+   "x": 509,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 15",
+   "properties": [
+    {
+     "id": "6d326627-1668-52ea-bf87-281b804d5b99",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "51fc2044-7a84-5b20-9983-8f3f6627655f",
+   "x": 594,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 16",
+   "properties": [
+    {
+     "id": "f8c52365-cfda-531f-93e0-ae57b566b329",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "db58b61f-bcdd-52d7-9fe5-a1652bb6b8d5",
+   "x": 594,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 17",
+   "properties": [
+    {
+     "id": "a4e97d49-346f-517f-89b1-31eca9f6971d",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "42e49b50-efa6-50de-a0a9-fdc436a24f66",
+   "x": 594,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 18",
+   "properties": [
+    {
+     "id": "8e47a682-6304-5c65-b19c-07f126363d33",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "589ccf5d-10e0-5a49-89b9-dc2229e3fdc2",
+   "x": 669,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 19",
+   "properties": [
+    {
+     "id": "2f8809b7-8b25-57d3-812e-4b52190ae1d8",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "eaa38885-4af3-5375-b7e7-0145188dbf0d",
+   "x": 669,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 20",
+   "properties": [
+    {
+     "id": "29512674-a84b-5e5d-8661-91b60dc5b8fe",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "60c3f0c7-0c9b-512b-a1ab-57633258cb6c",
+   "x": 669,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 21",
+   "properties": [
+    {
+     "id": "fde32344-d3dc-54d7-868e-cf9458329eef",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "b8a2b219-7cd9-5570-b69a-3e877f9c3b9a",
+   "x": 756,
+   "y": 502,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 22",
+   "properties": [
+    {
+     "id": "364824d5-ecd2-5deb-a61e-a2e378c4989f",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "e24e8c86-9faf-5c7a-bd34-29317550506a",
+   "x": 756,
+   "y": 586,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 23",
+   "properties": [
+    {
+     "id": "393ab703-48d6-5ea6-b99b-220f35cce083",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "b80a53df-3b94-5976-882e-5952ea9f97fc",
+   "x": 756,
+   "y": 673,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 24",
+   "properties": [
+    {
+     "id": "00e2495d-803f-525e-8a1a-d4822bc7c19a",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "99fdc83e-1c4a-53da-bbe2-5bb2f266de5c",
+   "x": 70,
+   "y": 362,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 25",
+   "properties": [
+    {
+     "id": "b0e8b181-8e1d-5a8d-95ae-c45a149479b4",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "bfc0b842-bb90-52af-92b0-34a17edef0d5",
+   "x": 71,
+   "y": 477,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 26",
+   "properties": [
+    {
+     "id": "282d0a4b-04d6-5267-aa08-fb66e786a823",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "03234837-f42a-5b4e-b23b-915081510735",
+   "x": 71,
+   "y": 595,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 27",
+   "properties": [
+    {
+     "id": "c428e19f-b49e-5236-a773-b4eb42ce3c08",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "66becdd8-149c-5f7d-9da8-4e49bac1357b",
+   "x": 70,
+   "y": 706,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 28",
+   "properties": [
+    {
+     "id": "42463f92-07de-5c87-bb5c-416dc7d800aa",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "4272d5a3-adb0-54a9-a018-776bcfc66c44",
+   "x": 894,
+   "y": 660,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 29",
+   "properties": [
+    {
+     "id": "5717cae1-0d18-5fca-84d0-51b99cd80431",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "cbe9006e-af50-5b36-861e-f12ffc6e8789",
+   "x": 1012,
+   "y": 659,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 30",
+   "properties": [
+    {
+     "id": "3ea2c105-35c7-505e-9fd4-6d13224800e2",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "5175b004-7e2d-58fd-b7a9-70d5777c4fe5",
+   "x": 915,
+   "y": 452,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 31",
+   "properties": [
+    {
+     "id": "282880e6-863d-58a7-a245-01657364108e",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  },
+  {
+   "id": "d34b43a5-30ee-548c-9df9-70444c0ca89b",
+   "x": 989,
+   "y": 450,
+   "width": 48,
+   "height": 48,
+   "visible": true,
+   "name": "Arbeitsplatz 32",
+   "properties": [
+    {
+     "id": "1d9e9908-e403-5c38-a5ca-12c794064894",
+     "type": "personalAreaPropertyData",
+     "accessClaimMode": "dynamic",
+     "allowedTags": [],
+     "ownerId": null
+    }
+   ]
+  }
+ ],
+ "entityCollections": [
+  {
+   "url": "https://workadventure.starhunter.software/collections/FurnitureCollection.json",
+   "type": "file"
+  },
+  {
+   "url": "https://workadventure.starhunter.software/collections/OfficeCollection.json",
+   "type": "file"
+  }
+ ],
+ "metadata": {
+  "name": "elunic Buero (neu)",
+  "description": "elunic Buero Erika-Mann-Str. 23 mit beanspruchbaren Arbeitsplaetzen"
+ }
+}

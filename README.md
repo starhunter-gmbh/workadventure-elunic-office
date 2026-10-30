@@ -1,7 +1,25 @@
 # elunic office – WorkAdventure map
 
-Rebuild of the elunic office (traced from the old Gather Town map) for our WorkAdventure instance
-(`workadventure.starhunter.software`).
+Maps of the elunic office for our WorkAdventure instance (`workadventure.starhunter.software`).
+
+## Live: new office, Erika-Mann-Str. 23, 6th floor (since 2026-10-30)
+
+Served at `/~/elunic-office.wam` (START_ROOM_URL). A painted map (Dream Loop target from the CSMM floor plan and the
+walk-through video), not built from starter-kit tiles.
+
+- `newoffice-art.png` – the painting (1952x800 px = 61x25 tiles); the tileset is this image cut into tiles
+- `newoffice_spec.py` – gameplay data: hand-measured walls/furniture/doors on the tile grid, seats (pixel centres),
+  rooms, silent zones, gong, start area
+- `build_newoffice_art.py` – builds `newoffice.tmj/.wam/.png`, `newoffice-rooms.json` (calendar rooms, copied to
+  `calendar/rooms.json` of wa-calendar in gitlab-ops-old-production-eu1-cluster) and `newoffice-script.js`
+  (= `elunic-desk-spawn.js` with this map's seats and rooms); fails on unreachable seats/rooms or desk rows that are
+  too close for the proximity chat
+- `pack_newoffice.sh` – build + upload: no argument = test map in `/~/neuesbuero/newoffice.wam` (calendar off),
+  `live` = the live map at the root (calendar on). A live upload replaces the desk claims.
+
+## Previous map (old office, until 2026-10-30)
+
+Rebuild of the old office (traced from the old Gather Town map).
 
 - `elunic-office.tmj` – the map (Tiled JSON, 54x36 tiles, 32px)
 - `elunic-office.png` – rendered preview
