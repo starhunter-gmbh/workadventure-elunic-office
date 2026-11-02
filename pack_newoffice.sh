@@ -3,7 +3,10 @@
 #   ./pack_newoffice.sh        test map, directory "neuesbuero" (https://workadventure.starhunter.software/~/neuesbuero/newoffice.wam),
 #                              calendar pings off
 #   ./pack_newoffice.sh live   the live office map at the root (START_ROOM_URL /~/elunic-office.wam), calendar on.
-#                              Replaces elunic-office.wam: desk claims of the previous map are dropped.
+#                              Desk claims and entities placed in the map editor are taken over from the live WAM as
+#                              long as the desk areas are unchanged (same ids); otherwise the claims are dropped.
+# The map storage upload REPLACES every file of the target directory (subdirectories stay): always upload the complete
+# package, never a single file.
 set -e
 cd "$(dirname "$0")"
 python3 build_newoffice_art.py
@@ -34,6 +37,15 @@ for p in tmj['properties']:
 json.dump(tmj, open(f'{out}/{name}.tmj', 'w'))
 wam = json.load(open('newoffice.wam'))
 wam['mapUrl'] = name + '.tmj'
+if name == 'elunic-office':
+    import urllib.request
+    live = json.load(urllib.request.urlopen('https://workadventure.starhunter.software/map-storage/elunic-office.wam'))
+    if {a['id'] for a in live.get('areas', [])} == {a['id'] for a in wam['areas']}:
+        wam['areas'] = live['areas']
+    else:
+        print('desk areas changed: live claims are dropped')
+    wam['entities'] = live.get('entities', {})
+    print('live claims', sum(1 for a in wam['areas'] for q in a.get('properties', []) if q.get('ownerId')), 'entities', len(wam['entities']))
 json.dump(wam, open(f'{out}/{name}.wam', 'w'), indent=1)
 shutil.copy('newoffice.png', f'{out}/{name}.png')
 PY
