@@ -147,7 +147,7 @@ for rid, label, rect in S.CONF_ROOMS:
     standing = sorted(([tx * 32 + 16, ty * 32 + 16] for tx, ty in tiles_of(rect) if not coll[ty][tx]
                        and all(math.hypot(tx * 32 + 16 - s[0], ty * 32 + 16 - s[1]) > 20 for s in seats)),
                       key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2)
-    rooms.append({"id": rid, "label": label, "seats": seats, "standing": standing})
+    rooms.append({"id": rid, "label": label, "rect": [x0, y0, x1 - x0, y1 - y0], "seats": seats, "standing": standing})
 json.dump({"rooms": rooms}, open(f'{KIT}/newoffice-rooms.json', 'w'), indent=1)
 print('rooms', [(r["id"], len(r["seats"]), len(r["standing"])) for r in rooms])
 

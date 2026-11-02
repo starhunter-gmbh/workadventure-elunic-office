@@ -112,7 +112,10 @@ WA.onInit().then(() => {
             // The meeting end is known locally: leave on time even if the service is slow or down.
             if (active && Date.now() >= active.endsAt) await leave();
             const who = WA.player.uuid + "|" + WA.player.name;
-            const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid, action };
+            // the position lets wa-calendar avoid rooms where somebody else stands when it picks a meeting room
+            const pos = await WA.player.getPosition().catch(() => null);
+            const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid, action,
+                x: pos ? pos.x : undefined, y: pos ? pos.y : undefined };
             if (action === "rejoin" && mine) finished.delete(mine.key + "|" + mine.endsAt);
             const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
                 signal: AbortSignal.timeout(10000) }).catch(() => null);

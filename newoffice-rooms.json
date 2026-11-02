@@ -3,6 +3,12 @@
   {
    "id": "conference-big",
    "label": "Large Meeting",
+   "rect": [
+    1472,
+    448,
+    448,
+    320
+   ],
    "seats": [
     [
      1572,
@@ -435,6 +441,12 @@
   {
    "id": "conference-small",
    "label": "Small Meeting",
+   "rect": [
+    1152,
+    448,
+    96,
+    320
+   ],
    "seats": [
     [
      1163,
@@ -535,6 +547,12 @@
   {
    "id": "meeting-four",
    "label": "Meeting 4",
+   "rect": [
+    1280,
+    448,
+    160,
+    320
+   ],
    "seats": [
     [
      1307,
@@ -707,6 +725,12 @@
   {
    "id": "lounge",
    "label": "Lounge",
+   "rect": [
+    32,
+    32,
+    544,
+    256
+   ],
    "seats": [
     [
      113,
