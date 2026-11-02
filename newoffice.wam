@@ -588,6 +588,10 @@
   {
    "url": "https://workadventure.starhunter.software/collections/OfficeCollection.json",
    "type": "file"
+  },
+  {
+   "url": "https://raw.githubusercontent.com/starhunter-gmbh/workadventure-elunic-office/main/collections/elunic/ElunicCollection.json",
+   "type": "file"
   }
  ],
  "metadata": {

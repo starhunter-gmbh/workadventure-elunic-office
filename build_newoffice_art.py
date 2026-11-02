@@ -131,7 +131,9 @@ desks = [c for r in S.DESK_ROWS for c in r] + S.OTHER_DESKS
 wam = {"version": "1.0.0", "mapUrl": "newoffice.tmj", "entities": {},
        "areas": [seat_area(i, x, y) for i, (x, y, _d) in enumerate(desks)],
        "entityCollections": [{"url": "https://workadventure.starhunter.software/collections/FurnitureCollection.json", "type": "file"},
-                             {"url": "https://workadventure.starhunter.software/collections/OfficeCollection.json", "type": "file"}],
+                             {"url": "https://workadventure.starhunter.software/collections/OfficeCollection.json", "type": "file"},
+                             # elunic entities (side/rotated screens, curved widescreen): collections/elunic in this repo
+                             {"url": "https://raw.githubusercontent.com/starhunter-gmbh/workadventure-elunic-office/main/collections/elunic/ElunicCollection.json", "type": "file"}],
        "metadata": {"name": "elunic Buero (neu)", "description": "elunic Buero Erika-Mann-Str. 23 mit beanspruchbaren Arbeitsplaetzen"}}
 json.dump(wam, open(f'{KIT}/newoffice.wam', 'w'), indent=1)
 spawns = {a["id"]: list(d) for a, d in zip(wam["areas"], desks)}

@@ -184,6 +184,86 @@
    "imagePath": "BigScreenWhiteRight.png",
    "direction": "Right",
    "color": "white"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenBlackDown.png",
+   "direction": "Down",
+   "color": "black"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenBlackUp.png",
+   "direction": "Up",
+   "color": "black"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenBlackLeft.png",
+   "direction": "Left",
+   "color": "black"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenBlackRight.png",
+   "direction": "Right",
+   "color": "black"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenWhiteDown.png",
+   "direction": "Down",
+   "color": "white"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenWhiteUp.png",
+   "direction": "Up",
+   "color": "white"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenWhiteLeft.png",
+   "direction": "Left",
+   "color": "white"
+  },
+  {
+   "name": "Curved Widescreen",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "CurvedScreenWhiteRight.png",
+   "direction": "Right",
+   "color": "white"
   }
  ]
 }
