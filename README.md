@@ -14,8 +14,8 @@ walk-through video), not built from starter-kit tiles.
   `calendar/rooms.json` of wa-calendar in gitlab-ops-old-production-eu1-cluster) and `newoffice-script.js`
   (= `elunic-desk-spawn.js` with this map's seats and rooms); fails on unreachable seats/rooms or desk rows that are
   too close for the proximity chat
-- `pack_newoffice.sh` – build + upload: no argument = test map in `/~/neuesbuero/newoffice.wam` (calendar off),
-  `live` = the live map at the root (calendar on). A live upload replaces the desk claims.
+- `pack_newoffice.sh` – build + upload of the live map at the root (calendar on); desk claims and editor entities of
+  the live map are kept. An upload replaces every file of the map storage root, so it always sends the full package.
 
 ## Previous map (old office, until 2026-10-30)
 

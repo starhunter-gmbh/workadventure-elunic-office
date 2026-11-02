@@ -111,8 +111,8 @@ tmj = {"compressionlevel": -1, "infinite": False, "orientation": "orthogonal", "
        "nextlayerid": lid[0] + 1, "nextobjectid": lid[0] + 1, "layers": layers, "tilesets": tilesets,
        "properties": [
            {"name": "mapCopyright", "type": "string", "value": "elunic, generated artwork"},
-           {"name": "mapDescription", "type": "string", "value": "elunic Buero, Erika-Mann-Str. 23, 6. OG (Testkarte)"},
-           {"name": "mapName", "type": "string", "value": "elunic Buero (neu)"},
+           {"name": "mapDescription", "type": "string", "value": "elunic Buero, Erika-Mann-Str. 23, 6. OG"},
+           {"name": "mapName", "type": "string", "value": "elunic Buero"},
            {"name": "mapImage", "type": "string", "value": "newoffice.png"},
            {"name": "script", "type": "string", "value": "elunic-desk-spawn.js"},   # the play bridges only trust this file name
        ]}
@@ -134,7 +134,7 @@ wam = {"version": "1.0.0", "mapUrl": "newoffice.tmj", "entities": {},
                              {"url": "https://workadventure.starhunter.software/collections/OfficeCollection.json", "type": "file"},
                              # elunic entities (side/rotated screens, curved widescreen): collections/elunic in this repo
                              {"url": "https://raw.githubusercontent.com/starhunter-gmbh/workadventure-elunic-office/main/collections/elunic/ElunicCollection.json", "type": "file"}],
-       "metadata": {"name": "elunic Buero (neu)", "description": "elunic Buero Erika-Mann-Str. 23 mit beanspruchbaren Arbeitsplaetzen"}}
+       "metadata": {"name": "elunic Buero", "description": "elunic Buero Erika-Mann-Str. 23 mit beanspruchbaren Arbeitsplaetzen"}}
 json.dump(wam, open(f'{KIT}/newoffice.wam', 'w'), indent=1)
 spawns = {a["id"]: list(d) for a, d in zip(wam["areas"], desks)}
 
