@@ -2,7 +2,8 @@
  "collectionName": "elunic",
  "tags": [
   "furniture",
-  "electronic"
+  "electronic",
+  "food"
  ],
  "collection": [
   {
@@ -264,6 +265,55 @@
    "imagePath": "CurvedScreenWhiteRight.png",
    "direction": "Right",
    "color": "white"
+  },
+  {
+   "name": "Spezi Flasche",
+   "tags": [
+    "food"
+   ],
+   "imagePath": "SpeziBottle.png",
+   "direction": "Down",
+   "color": "orange"
+  },
+  {
+   "name": "Keyboard",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "KeyboardDown.png",
+   "direction": "Down",
+   "color": "black"
+  },
+  {
+   "name": "Keyboard",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "KeyboardUp.png",
+   "direction": "Up",
+   "color": "black"
+  },
+  {
+   "name": "Keyboard",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "KeyboardLeft.png",
+   "direction": "Left",
+   "color": "black"
+  },
+  {
+   "name": "Keyboard",
+   "tags": [
+    "furniture",
+    "electronic"
+   ],
+   "imagePath": "KeyboardRight.png",
+   "direction": "Right",
+   "color": "black"
   }
  ]
 }
