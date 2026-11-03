@@ -621,8 +621,14 @@ WA.onInit().then(() => {
             const who = WA.player.uuid + "|" + WA.player.name;
             // the position lets wa-calendar avoid rooms where somebody else stands when it picks a meeting room
             const pos = await WA.player.getPosition().catch(() => null);
+            // ... and so do the positions of everybody this client sees: players whose own page still runs an older
+            // script (no position in their ping) count too
+            let others = [];
+            try {
+                others = Array.from(WA.players.list(), (p) => ({ uuid: p.uuid, name: p.name, x: p.position.x, y: p.position.y }));
+            } catch (e) { /* tracking not ready yet */ }
             const body = { token: token || undefined, name: WA.player.name, id: WA.player.uuid, action,
-                x: pos ? pos.x : undefined, y: pos ? pos.y : undefined };
+                x: pos ? pos.x : undefined, y: pos ? pos.y : undefined, others };
             if (action === "rejoin" && mine) finished.delete(mine.key + "|" + mine.endsAt);
             const res = await fetch(api, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
                 signal: AbortSignal.timeout(10000) }).catch(() => null);
