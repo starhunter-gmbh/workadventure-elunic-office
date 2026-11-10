@@ -105,7 +105,27 @@ WA.onInit().then(() => {
         status("restore");
     }
     let first = true;   // the first check right after entering the map
-    // action: undefined (regular ping), "leave" (button), "rejoin" (walked back into the own meeting room)
+    // --- conversation guard (Andreas Ullrich-Lohr, 2026-11-10: a meeting start cut his call with a colleague):
+    // a starting meeting never pulls the player out of a running conversation (proximity bubble). Instead a chip
+    // offers "join meeting"; the player joins on click, or by itself after TALK_FREE_MS without any conversation.
+    const TALK_FREE_MS = 15000;
+    let inTalk = false;
+    let talkEnded = 0;      // when the last conversation ended (0 = none on this page)
+    let pending = null;     // meeting held back because of a conversation
+    let joinTimer = null;
+    const talkBlocks = () => inTalk || (talkEnded > 0 && Date.now() - talkEnded < TALK_FREE_MS);
+    const scheduleAuto = () => {
+        clearTimeout(joinTimer);
+        joinTimer = null;
+        if (!pending || inTalk) return;
+        joinTimer = setTimeout(() => tick("auto"), Math.max(0, TALK_FREE_MS - (Date.now() - talkEnded)) + 300);
+    };
+    try {
+        WA.player.proximityMeeting.onJoin().subscribe(() => { inTalk = true; scheduleAuto(); });
+        WA.player.proximityMeeting.onLeave().subscribe(() => { inTalk = false; talkEnded = Date.now(); scheduleAuto(); });
+    } catch (e) { console.warn("elunic calendar: no conversation events, meetings start without the guard", e); }
+    // action: undefined (regular ping), "leave" (button), "rejoin" (walked back into the own meeting room),
+    // "join" (button of a held-back meeting, also when walking into its room), "auto" (conversation over for 15 s)
     async function tick(action) {
         while (busy && action) await new Promise((r) => setTimeout(r, 200));
         if (busy) return;
@@ -145,7 +165,16 @@ WA.onInit().then(() => {
                 if (meeting && finished.has(meeting.key + "|" + meeting.endsAt)) meeting = null;
                 mine = meeting;
             }
+            if (!meeting) pending = null;
             if (meeting && active && active.key === meeting.key) active.endsAt = meeting.endsAt;   // extended or shortened
+            const starting = meeting && (!active || active.key !== meeting.key);
+            if (starting && action !== "join" && talkBlocks()) {
+                // in a conversation (or it ended less than 15 s ago): offer the meeting instead of walking away
+                pending = meeting;
+                scheduleAuto();
+                return;
+            }
+            if (starting) { pending = null; clearTimeout(joinTimer); joinTimer = null; }
             if (meeting && (!active || active.key !== meeting.key || active.x !== meeting.x || active.y !== meeting.y)) {
                 const back = active ? active.back : (action === "rejoin" && lastBack) || await WA.player.getPosition();
                 active = { key: meeting.key, x: meeting.x, y: meeting.y, endsAt: meeting.endsAt, back };
@@ -178,11 +207,13 @@ WA.onInit().then(() => {
     // room a chip (like the one of a personal desk area) and a button to leave the meeting and go back to the desk.
     const de = (navigator.language || "").toLowerCase().startsWith("de");
     const T = de
-        ? { meeting: "Termin", private: "Privater Termin", room: "Terminraum", leave: "Termin verlassen und zum Platz zurück" }
-        : { meeting: "Meeting", private: "Private meeting", room: "Meeting room", leave: "Leave meeting and go back to my desk" };
+        ? { meeting: "Termin", private: "Privater Termin", room: "Terminraum", leave: "Termin verlassen und zum Platz zurück",
+            pending: "Termin läuft", join: "Termin beitreten" }
+        : { meeting: "Meeting", private: "Private meeting", room: "Meeting room", leave: "Leave meeting and go back to my desk",
+            pending: "Meeting started", join: "Join meeting" };
     const labelText = (r) => r.title || (r.isPrivate ? T.private : T.meeting);
-    const pageUrl = (page, text, button) => new URL(page + "?t=" + encodeURIComponent(text) + (button ? "&b=" + encodeURIComponent(button) : ""),
-        WA.room.mapURL).toString();
+    const pageUrl = (page, text, button, variable) => new URL(page + "?t=" + encodeURIComponent(text) + (button ? "&b=" + encodeURIComponent(button) : "")
+        + (variable ? "&v=" + encodeURIComponent(variable) : ""), WA.room.mapURL).toString();
     // Embedded websites get a white background from WorkAdventure: size the label frame to its text.
     const labelBox = (rect, text) => {
         const width = Math.min(rect[2] - 8, Math.round(34 + text.length * 7));
@@ -216,8 +247,10 @@ WA.onInit().then(() => {
     let chip = null, chipText = "", chipBusy = Promise.resolve();
     function refreshChip() {
         chipBusy = chipBusy.then(async () => {
-            const show = currentRoom && active && mine && !mine.left && mine.roomId === currentRoom;
-            const text = show ? T.room + ": " + labelText(mine) : "";
+            // a held-back meeting wins: its chip carries "join meeting"
+            const offer = !!pending;
+            const show = offer || (currentRoom && active && mine && !mine.left && mine.roomId === currentRoom);
+            const text = !show ? "" : offer ? T.pending + ": " + labelText(pending) : T.room + ": " + labelText(mine);
             if (text === chipText) return;
             chipText = text;
             if (chip) {
@@ -227,11 +260,13 @@ WA.onInit().then(() => {
             }
             if (!show) return;
             // The chip carries the "leave meeting" button (action bar buttons from scripts end up in a collapsed menu).
-            chip = await WA.ui.website.open({ url: pageUrl("meeting-chip.html", text, T.leave), visible: true, allowApi: true,
+            chip = await WA.ui.website.open({ url: offer ? pageUrl("meeting-chip.html", text, T.join, "elunicMeetingJoin") : pageUrl("meeting-chip.html", text, T.leave),
+                visible: true, allowApi: true,
                 position: { vertical: "top", horizontal: "right" }, size: { width: "340px", height: "82px" }, margin: { top: "84px", right: "16px" } });
         }).catch((e) => console.warn("elunic meeting chip", e));
     }
     WA.player.state.onVariableChange("elunicMeetingLeave").subscribe(() => tick("leave"));
+    WA.player.state.onVariableChange("elunicMeetingJoin").subscribe(() => tick("join"));
     for (const [id, rect] of Object.entries(ROOM_RECTS)) {
         const name = "elunic-room-" + id;
         WA.room.area.create({ name, x: rect[0], y: rect[1], width: rect[2], height: rect[3] });
@@ -239,6 +274,8 @@ WA.onInit().then(() => {
             currentRoom = id;
             // Walking back into the own meeting after "leave meeting" joins it again (Do not disturb, seat).
             if (mine && mine.left && mine.roomId === id && !scriptedMove) tick("rejoin");
+            // Walking into the room of a held-back meeting joins it.
+            else if (pending && pending.roomId === id && !scriptedMove) tick("join");
             refreshChip();
         });
         WA.room.area.onLeave(name).subscribe(() => {

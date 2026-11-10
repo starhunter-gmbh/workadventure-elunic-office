@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meeting room</title>
 <!-- Chip of the elunic office map while the player is inside the own meeting room (like a personal desk area), with
-     the button to leave the meeting. The button sets the player variable "elunicMeetingLeave"; the map script listens. -->
+     the button to leave the meeting, or, while a conversation holds a starting meeting back, the button to join it.
+     The button sets the player variable named in "v"; the map script listens. -->
 <script src="/iframe_api.js"></script>
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #1b2a41; }
@@ -30,7 +31,9 @@
   button.addEventListener("click", async () => {
     button.disabled = true;
     await WA.onInit();
-    WA.player.state.saveVariable("elunicMeetingLeave", Date.now(), { public: false, persist: false });
+    // "v": which player variable the map script listens to (elunicMeetingLeave, or elunicMeetingJoin for a held-back meeting)
+    const v = q.get("v") === "elunicMeetingJoin" ? "elunicMeetingJoin" : "elunicMeetingLeave";
+    WA.player.state.saveVariable(v, Date.now(), { public: false, persist: false });
   });
 </script>
 </body>
