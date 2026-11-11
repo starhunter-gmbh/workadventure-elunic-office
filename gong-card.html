@@ -8,7 +8,7 @@
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; background: transparent; font-family: system-ui, sans-serif; color: #fff; overflow: hidden; }
-  #stack { display: flex; flex-direction: column; gap: 8px; max-height: 70vh; overflow-y: auto; padding: 2px; }
+  #stack { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding: 2px; }
   .card { background: #2b2210; border: 1px solid #7a5a12; border-left: 5px solid #c4962e; border-radius: 10px; padding: 10px 12px; box-shadow: 0 4px 14px rgba(0,0,0,.45); position: relative; }
   .head { display: flex; align-items: baseline; gap: 8px; padding-right: 26px; }
   .from { font-weight: 700; font-size: 14px; color: #f3d487; }
@@ -147,7 +147,11 @@ async function fit() {
   if (!siteId) return;
   const stack = document.getElementById("stack");
   if (!gongs.length) { try { const s = await findSite(); if (s) await s.close(); } catch (e) { console.warn(e); } return; }
-  const h = Math.min(stack.scrollHeight + 6, Math.round(window.innerHeight * 0.7) + 6);
+  // The cap must not depend on this frame's own height (innerHeight / vh): the frame is resized to fit, so a cap taken
+  // from it shrinks the card on every render until the reaction row is cut off. The screen height does not change.
+  const cap = Math.min(520, Math.round(screen.height * 0.6));
+  stack.style.maxHeight = cap + "px";
+  const h = Math.min(stack.scrollHeight + 6, cap + 6);
   if (h === lastH) return;
   lastH = h;
   try {
