@@ -14,6 +14,10 @@ walk-through video), not built from starter-kit tiles.
   `calendar/rooms.json` of wa-calendar in gitlab-ops-old-production-eu1-cluster) and `newoffice-script.js`
   (= `elunic-desk-spawn.js` with this map's seats and rooms); fails on unreachable seats/rooms or desk rows that are
   too close for the proximity chat
+- `gong.html` / `gong-card.html` – the gong: space at the gong opens the message form; everybody in the room hears it and gets
+  a message card (top right) that stays until dismissed. Reactions on it: six quick ones plus a full picker, shown as counts with
+  the names on hover. Events: `elunic-gong` {id, from, message, ts} and `elunic-gong-reaction` {gong, emoji, on, by, name}
+  (idempotent per reactor). The card is a UI website the map script opens (`showGongCard` in `elunic-desk-spawn.js`).
 - `pack_newoffice.sh` – build + upload of the live map at the root (calendar on). The map storage deletes every
   file below the target directory before it unpacks a zip, including the custom entities uploaded in the map editor
   (`assets/entities/`). The script therefore snapshots the live storage first (local copy in

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gong</title>
+<script src="https://workadventure.starhunter.software/iframe_api.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; font-family: system-ui, sans-serif; color: #fff; overflow: hidden; }
+  #stack { display: flex; flex-direction: column; gap: 8px; max-height: 70vh; overflow-y: auto; padding: 2px; }
+  .card { background: #2b2210; border: 1px solid #7a5a12; border-left: 5px solid #c4962e; border-radius: 10px; padding: 10px 12px; box-shadow: 0 4px 14px rgba(0,0,0,.45); position: relative; }
+  .head { display: flex; align-items: baseline; gap: 8px; padding-right: 26px; }
+  .from { font-weight: 700; font-size: 14px; color: #f3d487; }
+  .time { font-size: 11px; color: #b9a56e; }
+  .close { position: absolute; top: 6px; right: 8px; border: 0; background: transparent; color: #d9c58f; font-size: 18px; line-height: 1; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+  .close:hover { background: rgba(255,255,255,.12); color: #fff; }
+  .msg { margin: 6px 0 8px; font-size: 14px; line-height: 1.35; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #5d4a1c; background: #3a2f16; color: #fff; border-radius: 12px; padding: 1px 8px; font: inherit; font-size: 13px; cursor: pointer; }
+  .chip:hover { background: #4a3c1c; }
+  .chip.mine { border-color: #e0b64a; background: #5a4412; }
+  .chip .n { font-size: 12px; color: #f3d487; }
+  .bar { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+  .qr { border: 0; background: transparent; font-size: 17px; cursor: pointer; border-radius: 6px; padding: 2px 5px; line-height: 1.2; }
+  .qr:hover { background: rgba(255,255,255,.14); }
+  .qr.mine { background: rgba(224,182,74,.28); }
+  .more { margin-left: auto; font-size: 12px; color: #d9c58f; border: 1px solid #5d4a1c; background: transparent; border-radius: 8px; padding: 2px 8px; cursor: pointer; font-family: inherit; }
+  .more:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .picker { margin-top: 6px; border-top: 1px solid #5d4a1c; padding-top: 6px; max-height: 180px; overflow-y: auto; }
+  .picker h4 { margin: 4px 0 2px; font-size: 11px; font-weight: 600; color: #b9a56e; text-transform: uppercase; letter-spacing: .04em; }
+  .grid { display: flex; flex-wrap: wrap; gap: 1px; }
+</style>
+</head>
+<body>
+<div id="stack"></div>
+<script>
+const DE = (navigator.language || "").toLowerCase().startsWith("de");
+const T = DE
+  ? { from: " hat den Gong geschlagen", you: "Du hast den Gong geschlagen", close: "Schließen", more: "Mehr", less: "Weniger", react: "Reagieren", and: " und " }
+  : { from: " hit the gong", you: "You hit the gong", close: "Dismiss", more: "More", less: "Less", react: "React", and: " and " };
+const SITE_URL = "gong-card.html";
+const EV_GONG = "elunic-gong", EV_REACT = "elunic-gong-reaction";
+const QUICK = ["👍", "❤️", "😂", "🎉", "👀", "🙏"];
+const GROUPS = DE
+  ? { "Smileys": "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 😉 😊 😍 🥰 😘 😋 😎 🤩 🥳 😏 🤔 🤨 😐 🙄 😬 😮 😲 😢 😭 😱 😡 😴 🤯 🤗 🫡 😇 🤝".split(" "),
+      "Gesten": "👍 👎 👏 🙌 🙏 💪 👌 ✌️ 🤞 🤟 👋 🫶 🤷 🤦 🙋 🫠".split(" "),
+      "Symbole": "❤️ 🧡 💛 💚 💙 💜 🔥 ✨ 🎉 🎊 🚀 💯 ✅ ❌ ❓ ❗ ⭐ 🏆 ☕ 🍕 🍰 🍻 🎵 🔔".split(" ") }
+  : { "Smileys": "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 😉 😊 😍 🥰 😘 😋 😎 🤩 🥳 😏 🤔 🤨 😐 🙄 😬 😮 😲 😢 😭 😱 😡 😴 🤯 🤗 🫡 😇 🤝".split(" "),
+      "Gestures": "👍 👎 👏 🙌 🙏 💪 👌 ✌️ 🤞 🤟 👋 🫶 🤷 🤦 🙋 🫠".split(" "),
+      "Symbols": "❤️ 🧡 💛 💚 💙 💜 🔥 ✨ 🎉 🎊 🚀 💯 ✅ ❌ ❓ ❗ ⭐ 🏆 ☕ 🍕 🍰 🍻 🎵 🔔".split(" ") };
+const MAX_CARDS = 20;
+
+// gongs: newest first. reactions: emoji -> Map(reactor key -> name). Reactions are idempotent (set/remove per reactor),
+// so duplicates from a server echo or a second delivery path change nothing.
+const gongs = [];
+const pending = {};          // reactions that arrived before their gong: gong id -> [events]
+let me = { key: "me", name: "" };
+let siteId = null;
+const openPickers = new Set();
+
+function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function clock(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+
+function addGong(g) {
+  if (!g || !g.id || gongs.some((x) => x.id === g.id)) return;
+  const gong = { id: String(g.id), from: String(g.from || "?"), message: String(g.message || "").slice(0, 200),
+                 ts: Number(g.ts) || Date.now(), mine: !!g.mine, reactions: new Map() };
+  gongs.unshift(gong);
+  while (gongs.length > MAX_CARDS) gongs.pop();
+  for (const ev of pending[gong.id] || []) applyReaction(gong, ev);
+  delete pending[gong.id];
+  render();
+}
+function applyReaction(gong, ev) {
+  const emoji = String(ev.emoji || "").slice(0, 16);
+  if (!emoji) return;
+  let who = gong.reactions.get(emoji);
+  if (ev.on === false) {
+    if (who) { who.delete(ev.by); if (!who.size) gong.reactions.delete(emoji); }
+    return;
+  }
+  if (!who) { who = new Map(); gong.reactions.set(emoji, who); }
+  who.set(String(ev.by), String(ev.name || "?"));
+}
+function onReaction(ev) {
+  if (!ev || !ev.gong || !ev.by) return;
+  const gong = gongs.find((g) => g.id === ev.gong);
+  if (!gong) { (pending[ev.gong] = pending[ev.gong] || []).push(ev); if (pending[ev.gong].length > 200) pending[ev.gong].shift(); return; }
+  applyReaction(gong, ev);
+  render();
+}
+function toggle(gong, emoji) {
+  const who = gong.reactions.get(emoji);
+  const on = !(who && who.has(me.key));
+  const ev = { gong: gong.id, emoji, on, by: me.key, name: me.name };
+  applyReaction(gong, ev);
+  render();
+  try { WA.event.broadcast(EV_REACT, ev); } catch (e) { console.warn(e); }
+}
+function dismiss(id) {
+  const i = gongs.findIndex((g) => g.id === id);
+  if (i >= 0) gongs.splice(i, 1);
+  openPickers.delete(id);
+  render();
+}
+
+function render() {
+  const stack = document.getElementById("stack");
+  stack.innerHTML = gongs.map((g) => {
+    const chips = [...g.reactions.entries()].map(([emoji, who]) => {
+      const names = [...who.values()].join(", ");
+      return `<button class="chip${who.has(me.key) ? " mine" : ""}" data-act="toggle" data-id="${esc(g.id)}" data-e="${esc(emoji)}" title="${esc(names)}">${esc(emoji)} <span class="n">${who.size}</span></button>`;
+    }).join("");
+    const quick = QUICK.map((e) => {
+      const mineNow = g.reactions.get(e) && g.reactions.get(e).has(me.key);
+      return `<button class="qr${mineNow ? " mine" : ""}" data-act="toggle" data-id="${esc(g.id)}" data-e="${esc(e)}" title="${esc(T.react)}">${e}</button>`;
+    }).join("");
+    const open = openPickers.has(g.id);
+    const picker = open ? `<div class="picker">${Object.entries(GROUPS).map(([name, list]) =>
+      `<h4>${esc(name)}</h4><div class="grid">${list.map((e) => `<button class="qr" data-act="toggle" data-id="${esc(g.id)}" data-e="${esc(e)}">${e}</button>`).join("")}</div>`).join("")}</div>` : "";
+    const title = g.mine ? T.you : esc(g.from) + T.from;
+    return `<div class="card" data-card="${esc(g.id)}">
+      <button class="close" data-act="close" data-id="${esc(g.id)}" title="${esc(T.close)}" aria-label="${esc(T.close)}">×</button>
+      <div class="head"><span class="from">${g.mine ? esc(title) : title}</span><span class="time">${clock(g.ts)}</span></div>
+      <div class="msg">${esc(g.message)}</div>
+      ${chips ? `<div class="chips">${chips}</div>` : ""}
+      <div class="bar">${quick}<button class="more" data-act="more" data-id="${esc(g.id)}">${open ? T.less : T.more}</button></div>
+      ${picker}
+    </div>`;
+  }).join("");
+  fit();
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const id = b.dataset.id, gong = gongs.find((g) => g.id === id);
+  if (!gong) return;
+  if (b.dataset.act === "toggle") toggle(gong, b.dataset.e);
+  else if (b.dataset.act === "close") dismiss(id);
+  else if (b.dataset.act === "more") { if (openPickers.has(id)) openPickers.delete(id); else openPickers.add(id); render(); }
+});
+
+// The overlay is only as big as its content, so clicks next to the cards still reach the game.
+let lastH = 0;
+async function fit() {
+  if (!siteId) return;
+  const stack = document.getElementById("stack");
+  if (!gongs.length) { try { const s = await findSite(); if (s) await s.close(); } catch (e) { console.warn(e); } return; }
+  const h = Math.min(stack.scrollHeight + 6, Math.round(window.innerHeight * 0.7) + 6);
+  if (h === lastH) return;
+  lastH = h;
+  try {
+    WA.ui.website.getById(siteId).then((s) => { if (s) s.size.height = h + "px"; }).catch(() => {});
+  } catch (e) { console.warn(e); }
+}
+async function findSite() {
+  const all = await WA.ui.website.getAll();
+  return all.find((s) => s.id === siteId);
+}
+// The page is opened by the map script with #g=<gong>; more gongs arrive as #add=<gong> (hash-only change, no reload)
+// and as plain events.
+function fromHash() {
+  const m = /[#&](?:g|add)=([^&]+)/.exec(location.hash);
+  if (!m) return;
+  try { addGong(JSON.parse(decodeURIComponent(m[1]))); } catch (e) { console.warn(e); }
+}
+window.addEventListener("hashchange", fromHash);
+try { const ch = new BroadcastChannel("elunic-gong"); ch.onmessage = (m) => { if (m.data && m.data.id) addGong(m.data); }; } catch (e) { /* same-origin only, optional */ }
+
+WA.onInit().then(async () => {
+  try { me = { key: String(WA.player.uuid || WA.player.playerId || "me"), name: WA.player.name || "?" }; } catch (e) { console.warn(e); }
+  try {
+    // the overlay this page runs in: the one whose url is this page
+    const all = await WA.ui.website.getAll();
+    const mine = all.find((s) => s.url.indexOf(SITE_URL) >= 0);
+    siteId = mine ? mine.id : null;
+  } catch (e) { console.warn(e); }
+  WA.event.on(EV_GONG).subscribe((ev) => {
+    const d = ev.data || {};
+    addGong({ id: d.id || (String(d.from) + "|" + String(d.message) + "|" + String(d.ts || "")), from: d.from, message: d.message, ts: d.ts });
+  });
+  WA.event.on(EV_REACT).subscribe((ev) => onReaction(ev.data));
+  fromHash();
+  render();
+});
+</script>
+</body>
+</html>

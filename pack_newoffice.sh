@@ -38,7 +38,7 @@ fi
 tar -C "$OUT" -xf "$BACKUPS/$STAMP.tar"
 rm -rf "$OUT/tilesets"
 mkdir -p "$OUT/tilesets"
-cp meeting-label.html meeting-chip.html gong.html elunic-gong.ogg "$OUT/"
+cp meeting-label.html meeting-chip.html gong.html gong-card.html elunic-gong.ogg "$OUT/"
 python3 -c "
 import json, shutil, sys
 for t in json.load(open('newoffice.tmj'))['tilesets']: shutil.copy(t['image'], sys.argv[1] + '/' + t['image'])

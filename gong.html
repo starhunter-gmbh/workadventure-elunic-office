@@ -44,10 +44,23 @@ WA.onInit().then(() => {
     const message = document.getElementById("msg").value.trim().slice(0, 200);
     if (!message) return;
     const from = WA.player.name || "Someone";
-    await WA.event.broadcast("elunic-gong", { from, message });
+    const gong = { id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)), from, message, ts: Date.now() };
+    await WA.event.broadcast("elunic-gong", gong);
     // ring locally for the sender
     try { WA.sound.loadSound(new URL("elunic-gong.ogg", location.href).toString()).play({ volume: 0.7, loop: false }); } catch (err) { console.warn(err); }
-    WA.ui.banner.openBanner({ id: "elunic-gong", text: ((navigator.language || "").toLowerCase().startsWith("de") ? from + " hat den Gong geschlagen: " : from + " hit the gong: ") + message, bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000 });
+    // the sender gets the same message card as everybody else, so they see the reactions too
+    try {
+      const base = new URL("gong-card.html", location.href).toString();
+      const own = { ...gong, mine: true };
+      const payload = encodeURIComponent(JSON.stringify(own));
+      const existing = (await WA.ui.website.getAll()).find((s) => s.url.indexOf("gong-card.html") >= 0);
+      if (existing) existing.url = base + "#add=" + payload;
+      else await WA.ui.website.open({ url: base + "#g=" + payload, allowApi: true, visible: true,
+        position: { vertical: "top", horizontal: "right" }, size: { width: "392px", height: "220px" }, margin: { top: "56px", right: "12px" } });
+    } catch (err) {
+      console.warn(err);
+      WA.ui.banner.openBanner({ id: "elunic-gong", text: ((navigator.language || "").toLowerCase().startsWith("de") ? from + " hat den Gong geschlagen: " : from + " hit the gong: ") + message, bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000 });
+    }
     close();
   };
 });

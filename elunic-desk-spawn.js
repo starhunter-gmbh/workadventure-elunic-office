@@ -319,22 +319,42 @@ WA.onInit().then(async () => {
     });
 });
 
-// --- gong: walk up to it, press space, enter a message; everybody in the room hears it and sees a banner ---
+// --- gong: walk up to it, press space, enter a message; everybody in the room hears it and gets a message card that stays
+// until they dismiss it. Everybody can react to it (quick reactions plus a full picker), see gong-card.html. ---
 const GONG_EVENT = "elunic-gong";
 // WA.room.mapURL is only available after WA.onInit(), so resolve URLs lazily.
 const gongSound = () => new URL("elunic-gong.ogg", WA.room.mapURL).toString();
-// Banner in the receiver's browser language: German for "de*", English otherwise.
+// Banner in the receiver's browser language: German for "de*", English otherwise. Only the fallback if the card cannot open.
 function gongText(from, message) {
     return (navigator.language || "").toLowerCase().startsWith("de")
         ? from + " hat den Gong geschlagen: " + message
         : from + " hit the gong: " + message;
 }
-function ringGong(from, message) {
-    try { WA.sound.loadSound(gongSound()).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
-    WA.ui.banner.openBanner({
-        id: "elunic-gong", text: gongText(from, message),
-        bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,
+// Opens the message card, or hands the gong to the card that is already open (hash-only change, no reload).
+// The card dedups by gong id, so it does not matter that it also receives the event itself.
+let gongCardQueue = Promise.resolve();
+function showGongCard(g) {
+    gongCardQueue = gongCardQueue.then(async () => {
+        const base = new URL("gong-card.html", WA.room.mapURL).toString();
+        const payload = encodeURIComponent(JSON.stringify(g));
+        const existing = (await WA.ui.website.getAll()).find((s) => s.url.indexOf("gong-card.html") >= 0);
+        if (existing) { existing.url = base + "#add=" + payload; return; }
+        await WA.ui.website.open({
+            url: base + "#g=" + payload, allowApi: true, visible: true,
+            position: { vertical: "top", horizontal: "right" },
+            size: { width: "392px", height: "220px" }, margin: { top: "56px", right: "12px" },
+        });
+    }).catch((e) => {
+        console.warn(e);
+        WA.ui.banner.openBanner({
+            id: "elunic-gong", text: gongText(g.from, g.message),
+            bgColor: "#7a5a12", textColor: "#ffffff", closable: true, timeToClose: 30000,
+        });
     });
+}
+function ringGong(g) {
+    try { WA.sound.loadSound(gongSound()).play({ volume: 0.7, loop: false }); } catch (e) { console.warn(e); }
+    showGongCard(g);
 }
 WA.onInit().then(() => {
     WA.room.area.create({ name: "elunic-gong", x: 40 * 32, y: 19 * 32, width: 5 * 32, height: 2 * 32 });
@@ -350,10 +370,12 @@ WA.onInit().then(() => {
         });
     });
     WA.room.area.onLeave("elunic-gong").subscribe(() => { if (action) action.remove(); action = undefined; });
-    // Senders ring locally in gong.html; skip our own echo if the server reflects it.
+    // Senders ring locally in gong.html (which opens their own card); skip our own echo if the server reflects it.
     WA.event.on(GONG_EVENT).subscribe((ev) => {
         if (ev.senderId !== undefined && ev.senderId === WA.player.playerId) return;
         const d = ev.data || {};
-        ringGong(String(d.from || "?"), String(d.message || "").slice(0, 200));
+        const from = String(d.from || "?"), message = String(d.message || "").slice(0, 200);
+        // same fallback id as gong-card.html, for senders that predate the id
+        ringGong({ id: String(d.id || (String(d.from) + "|" + String(d.message) + "|" + String(d.ts || ""))), from, message, ts: Number(d.ts) || Date.now() });
     });
 });
