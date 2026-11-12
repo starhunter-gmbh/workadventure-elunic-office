@@ -379,3 +379,19 @@ WA.onInit().then(() => {
         ringGong({ id: String(d.id || (String(d.from) + "|" + String(d.message) + "|" + String(d.ts || ""))), from, message, ts: Number(d.ts) || Date.now() });
     });
 });
+
+// Companion bridge (2026-11-12, Andreas Ullrich-Lohr): the Starhunter Companion embeds this office as a small tile or an invisible tab.
+// It tells the Companion when the player is in a conversation (proximity bubble) so the tile can grow by itself. Only when the play page
+// is framed (window.top is then the Companion, not the play page); opened on its own nothing is sent. The message carries no names, only the state.
+const toCompanion = (event, extra) => {
+    try {
+        if (window.top !== window.parent) window.top.postMessage(Object.assign({ type: "elunic-companion-wa", event }, extra), "*");
+    } catch (e) { /* no framing page we can talk to */ }
+};
+WA.onInit().then(() => {
+    toCompanion("hello");
+    try {
+        WA.player.proximityMeeting.onJoin().subscribe(() => toCompanion("meeting", { active: true }));
+        WA.player.proximityMeeting.onLeave().subscribe(() => toCompanion("meeting", { active: false }));
+    } catch (e) { console.warn("elunic companion bridge: no conversation events", e); }
+});
