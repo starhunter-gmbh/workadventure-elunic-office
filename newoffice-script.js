@@ -307,7 +307,49 @@ WA.onInit().then(async () => {
         } catch (e) { /* no tracking: treat as free */ }
         return false;
     };
+    // --- sitting look: a player who rests on a chair centre is drawn sitting, for everybody. The state is a public player
+    // variable (every client reads it for the others) and goes to the play frontend (seat bridge), which draws the
+    // character. Images without the bridge ignore the message, nothing else changes. ---
+    const SIT_VAR = "elunicSit";
+    const SIT_ON_PX = 2;           // resting this close to a chair centre = sitting (the chair snap ends exactly on it)
+    const STAND_PX = 4;            // moving more than this away from the seat = standing up
+    let sitting = false, seatedAt = null, lastPos = null;
+    const pushSitLook = () => {
+        const players = [];
+        try { for (const p of WA.players.list()) if (p.state[SIT_VAR] === true) players.push(p.playerId); } catch (e) { /* no tracking */ }
+        window.parent.postMessage({ type: "elunic-sitlook", self: sitting, players }, "*");
+    };
+    const setSitting = (v, chair) => {
+        seatedAt = v ? chair : null;
+        if (v === sitting) return;
+        sitting = v;
+        WA.player.state.saveVariable(SIT_VAR, v, { public: true, persist: false, scope: "room" }).catch((e) => console.warn(e));
+        pushSitLook();
+    };
+    // Called with every move event and every poll (teleports onto a chair, e.g. desk spawn or calendar, send no event).
+    const sitCheck = (x, y, moving) => {
+        const chair = moving ? null : nearestChair(x, y, SIT_ON_PX);
+        if (chair) setSitting(true, chair);
+        else if (!sitting) return;
+        else if (!moving || !seatedAt || Math.hypot(seatedAt[0] - x, seatedAt[1] - y) > STAND_PX) setSitting(false, null);
+    };
+    try {
+        WA.players.onVariableChange(SIT_VAR).subscribe(pushSitLook);
+        WA.players.onPlayerEnters.subscribe(pushSitLook);
+        WA.players.onPlayerLeaves.subscribe(pushSitLook);
+    } catch (e) { console.warn(e); }
+    setInterval(async () => {
+        try {
+            const pos = await WA.player.getPosition();
+            const moving = !!lastPos && (lastPos.x !== pos.x || lastPos.y !== pos.y);
+            lastPos = { x: pos.x, y: pos.y };
+            sitCheck(pos.x, pos.y, moving);
+            pushSitLook();   // also brings late joiners and reloaded frontends up to date
+        } catch (e) { /* not ready */ }
+    }, 1000);
     WA.player.onPlayerMove((ev) => {
+        lastPos = { x: ev.x, y: ev.y };
+        sitCheck(ev.x, ev.y, ev.moving);
         if (ev.moving || scriptedMove) return;   // the calendar walk/teleport places the player itself
         let best = null, bestDist = Infinity;
         for (const c of CHAIRS) {
